@@ -71,7 +71,39 @@ Class stuClass = Class.forName("fanshe.field.Student");
 
 泛型方法：定义泛型方法时，必须在返回值前边加一个<T>，来声明这是一个泛型方法，还得有一个泛型对象参数
 
-泛型类
+泛型类：在类名后加一个<T>
+
+静态方法不可以访问类上定义的泛型 
+如果静态方法操作的应用数据类型不确定，可以将泛型定义在方法上。
+
+意义和作用有
+类型的参数化，就是可以把类型像方法的参数那样传递。这一点意义非凡。
+泛型使编译器可以在编译期间对类型进行检查以提高类型安全，减少运行时由于对象类型不匹配引发的异常。
+
+```java
+class Demo<T>
+{
+    public void show(T t)
+    {
+        System.out.println("show: "+t);
+    }
+    public <Q> void print(Q q)
+    {
+        System.out.println("print:"+q);
+    }
+
+    public static <W>void method(W t)
+    {
+        System.out.println("method: "+t);
+    }
+}
+```
+
+
+
+## Object的九个方法
+
+equal		hashCode		wait		notify		notifyAll		toString		clone		getClass		finalize
 
 ## 访问修饰符
 
@@ -85,20 +117,20 @@ Class stuClass = Class.forName("fanshe.field.Student");
 ## Java 面向对象编程三大特性:封装、继承、多态
 
 封装
-
 封装把一个对象的属性私有化，同时提供一些想被外界访问的属性的方法
 
 继承
 通过使用继承我们能够非常方便地复用以前的代码。
+
 多态
 指一个引用（类型）在不同的情况下的多种状态
 在Java中有两种形式可以实现多态：继承（多个子类对同一方法的重写）和接口（实现接口并覆盖接口中同一方法）。
 
-## String 和 StringBuffer、StringBuiler封装
+## String 和 StringBuffer、StringBuiler
 
 #### 可变性 　
 
-简单的来说：String 类中使用 final 关键字字符数组保存字符串，private　final　char　value[]，所以 String 对象是不可变的。而StringBuilder 与 StringBuffer 都继承自 AbstractStringBuilder 类，在 AbstractStringBuilder 中也是使用字符数组保存字符串char[]value 但是没有用 final 关键字修饰，所以这两种对象都是可变的。
+简单的来说：String 类中使用 final 关键字字符数组保存字符串，private　final　char　value[]，且String类的外部不能访问这个成员变量，所以 String 对象是不可变的。而StringBuilder 与 StringBuffer 都继承自 AbstractStringBuilder 类，在 AbstractStringBuilder 中也是使用字符数组保存字符串char[]value 但是没有用 final 关键字修饰，所以这两种对象都是可变的。
 
 #### 线程安全性
 
@@ -186,12 +218,15 @@ class Bean{
 
 4.一个类实现接口的话要实现接口的所有方法，而抽象类不一定
 
+5.抽象方法可以有public、protected和default这些修饰符 ，接口方法默认修饰符是public。你不可以使用其它修饰符。
+
 ## 成员变量与局部变量的区别有那些
 
 1. 成员变量是属于类的，而局部变量是在方法中定义的变量或是方法的参数；成员变量可以被 public,private,static 等修饰符所修饰，而局部变量不能被访问控制修饰符及 static 所修饰；但是，成员变量和局部变量都能被 final 所修饰；
 2. 从变量在内存中的存储方式来看，成员变量是对象的一部分，而对象存在于堆内存，局部变量存在于栈内存
 3. 从变量在内存中的生存时间上看，成员变量是对象的一部分，它随着对象的创建而存在，而局部变量随着方法的调用而自动消失。
 4. 成员变量如果没有被赋初值，则会自动以类型的默认值而赋值（一种情况例外被 final 修饰的成员变量也必须显示地赋值）；而局部变量则不会自动赋值。
+5. 
 
 ## 构造方法有哪些特性
 
