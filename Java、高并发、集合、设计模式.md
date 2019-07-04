@@ -71,7 +71,39 @@ Class stuClass = Class.forName("fanshe.field.Student");
 
 泛型方法：定义泛型方法时，必须在返回值前边加一个<T>，来声明这是一个泛型方法，还得有一个泛型对象参数
 
-泛型类
+泛型类：在类名后加一个<T>
+
+静态方法不可以访问类上定义的泛型 
+如果静态方法操作的应用数据类型不确定，可以将泛型定义在方法上。
+
+意义和作用有
+类型的参数化，就是可以把类型像方法的参数那样传递。这一点意义非凡。
+泛型使编译器可以在编译期间对类型进行检查以提高类型安全，减少运行时由于对象类型不匹配引发的异常。
+
+```java
+class Demo<T>
+{
+    public void show(T t)
+    {
+        System.out.println("show: "+t);
+    }
+    public <Q> void print(Q q)
+    {
+        System.out.println("print:"+q);
+    }
+
+    public static <W>void method(W t)
+    {
+        System.out.println("method: "+t);
+    }
+}
+```
+
+
+
+## Object的九个方法
+
+equal		hashCode		wait		notify		notifyAll		toString		clone		getClass		finalize
 
 ## 访问修饰符
 
@@ -85,20 +117,20 @@ Class stuClass = Class.forName("fanshe.field.Student");
 ## Java 面向对象编程三大特性:封装、继承、多态
 
 封装
-
 封装把一个对象的属性私有化，同时提供一些想被外界访问的属性的方法
 
 继承
 通过使用继承我们能够非常方便地复用以前的代码。
+
 多态
 指一个引用（类型）在不同的情况下的多种状态
 在Java中有两种形式可以实现多态：继承（多个子类对同一方法的重写）和接口（实现接口并覆盖接口中同一方法）。
 
-## String 和 StringBuffer、StringBuiler封装
+## String 和 StringBuffer、StringBuiler
 
 #### 可变性 　
 
-简单的来说：String 类中使用 final 关键字字符数组保存字符串，private　final　char　value[]，所以 String 对象是不可变的。而StringBuilder 与 StringBuffer 都继承自 AbstractStringBuilder 类，在 AbstractStringBuilder 中也是使用字符数组保存字符串char[]value 但是没有用 final 关键字修饰，所以这两种对象都是可变的。
+简单的来说：String 类中使用 final 关键字字符数组保存字符串，private　final　char　value[]，且String类的外部不能访问这个成员变量，所以 String 对象是不可变的。而StringBuilder 与 StringBuffer 都继承自 AbstractStringBuilder 类，在 AbstractStringBuilder 中也是使用字符数组保存字符串char[]value 但是没有用 final 关键字修饰，所以这两种对象都是可变的。
 
 #### 线程安全性
 
@@ -112,7 +144,13 @@ String 中的对象是不可变的，也就可以理解为常量，线程安全�
 
 i.表达式右边是纯字符串常量，那么存放在栈里面。
 
-ii.表达式右边如果存在字符串引用，也就是字符串对象的句柄，那么就存放在堆里面。
+ii.表达式右边如果存在字符串引用，也就是字符串对象的句柄，那么就存放在堆里面
+
+## 浅拷贝和深拷贝
+
+浅拷贝：拷贝对象和原始对象的引用类型引用同一个对象。
+
+深拷贝：拷贝对象和原始对象的引用类型引用不同对象。
 
 ## 自动装箱与拆箱
 
@@ -186,12 +224,15 @@ class Bean{
 
 4.一个类实现接口的话要实现接口的所有方法，而抽象类不一定
 
+5.抽象方法可以有public、protected和default这些修饰符 ，接口方法默认修饰符是public。你不可以使用其它修饰符。
+
 ## 成员变量与局部变量的区别有那些
 
 1. 成员变量是属于类的，而局部变量是在方法中定义的变量或是方法的参数；成员变量可以被 public,private,static 等修饰符所修饰，而局部变量不能被访问控制修饰符及 static 所修饰；但是，成员变量和局部变量都能被 final 所修饰；
 2. 从变量在内存中的存储方式来看，成员变量是对象的一部分，而对象存在于堆内存，局部变量存在于栈内存
 3. 从变量在内存中的生存时间上看，成员变量是对象的一部分，它随着对象的创建而存在，而局部变量随着方法的调用而自动消失。
 4. 成员变量如果没有被赋初值，则会自动以类型的默认值而赋值（一种情况例外被 final 修饰的成员变量也必须显示地赋值）；而局部变量则不会自动赋值。
+5. 
 
 ## 构造方法有哪些特性
 
@@ -430,13 +471,17 @@ Collections.sort(stus,new Comparator<Student>() {
 同步代码块：同步语句块的实现使用的是monitorenter 和 monitorexit 指令
 方法：方法表示ACC_SYNCHRONIZED；
 
-Entry_Set     Wait_Set
+![img](https://user-gold-cdn.xitu.io/2018/7/27/164daccb3b88464e?imageView2/0/w/1280/h/960/format/webp/ignore-error/1)
 
 #### synchronized关键字最主要的三种使用方式：
 
 修饰实例方法，作用于当前对象实例加锁，进入同步代码前要获得当前对象实例的锁
 修饰静态方法，作用于当前类对象加锁，进入同步代码前要获得当前类对象的锁 
 修饰代码块
+
+#### CAS和synchronized的取舍
+
+CAS适用于写比较少的情况下（多读场景，冲突一般较少），synchronized适用于写比较多的情况下（多写场景，冲突一般较多）
 
 #### 谈谈 synchronized和ReenTrantLock 的区别
 
@@ -461,6 +506,8 @@ Entry_Set     Wait_Set
 
 总是假设最好的情况，每次去拿数据的时候都认为别人不会修改，所以不会上锁，但是在更新的时候会判断一下在此期间别人有没有去更新这个数据，可以使用版本号机制和CAS算法实现。
 
+缺点：ABA问题、CAS自旋消耗CPU、只能保证一个共享变量的原子操作。
+
 #### 自旋锁
 
 自旋锁是指尝试获取锁的线程不会立即阻塞，而是采用循环的方式去尝试获取锁，这样的好处是减少线程上下文切换的消耗，缺点是循环会消耗CPU。
@@ -478,6 +525,12 @@ Entry_Set     Wait_Set
 #### 锁消除
 
 (有锁但不存在竞争，锁多余)：JVM编译优化，将不存在数据竞争的锁消除
+
+#### 锁粗话
+
+![img](https://img-blog.csdn.net/20180410165014655)
+
+类似上图中的append方法，如果虚拟机探测到有一串零碎操作都是对同一对象加锁，将会把加锁同步的范围扩展到整个操作序列的外部，也就是在第一个和最后一个append操作之后。
 
 ## Volatile:
 
@@ -757,6 +810,8 @@ peek        返回队列头部的元素，如果队列为空，则返回null
 
 ## ThreadLocal及其引发的内存泄露
 
+![ThreadLocalæ°æ®è¯»ååè®¾ç½®è¿ç¨](https://img-blog.csdn.net/20160722160254682)
+
 当释放掉对threadlocal对象的强引用后，map里面的value没有被回收，但却永远不会被访问到了，因此ThreadLocal存在着内存泄露问题。在不使用该ThreadLocal对象时，及时调用该对象的remove方法去移除ThreadLocal.ThreadLocalMap中的对应Entry。
 
 # 集合类
@@ -867,25 +922,17 @@ public class LRUCache {
 
 它继承于 **AbstractList**，实现了 **List**, **RandomAccess**, **Cloneable**, **java.io.Serializable** 这些接口。
 
-在我们学数据结构的时候就知道了线性表的顺序存储，插入删除元素的时间复杂度为**O（n）**,求表长以及增加元素，取第 i 元素的时间复杂度为**O（1）**
-
-　 ArrayList 继承了AbstractList，实现了List。它是一个数组队列，提供了相关的添加、删除、修改、遍历等功能。
-
-　　ArrayList 实现了**RandomAccess 接口**，即提供了随机访问功能。RandomAccess 是 Java 中用来被 List 实现，为 List 提供**快速访问功能**的。在 ArrayList 中，我们即可以通过元素的序号快速获取元素对象，这就是快速随机访问。
-
-　　ArrayList 实现了**Cloneable 接口**，即覆盖了函数 clone()，**能被克隆**。
-
-　　ArrayList 实现**java.io.Serializable 接口**，这意味着ArrayList**支持序列化**，**能通过序列化去传输**。
-
-　　和 Vector 不同，**ArrayList 中的操作不是线程安全的**！所以，建议在单线程中才使用 ArrayList，而在多线程中可以选择 Vector 或者 CopyOnWriteArrayList。
-
 以无参数构造方法创建 ArrayList 时，实际上初始化赋值的是一个空数组。当真正对数组进行添加元素操作时，才真正分配容量。即向数组中添加第一个元素时，数组容量扩为10。然后每次扩容为1.5倍
+
+在JDK1.7中，如果通过无参构造的话，初始数组容量为0，当真正对数组进行添加时，才真正分配容量。
+每次按照1.5倍（位运算）的比率通过copeOf的方式扩容。 
+在JKD1.6中，如果通过无参构造的话，初始数组容量为10.每次通过copeOf的方式扩容后容量为原来的1.5倍加1.以上就是动态扩容的原理。
+
+数据量大的优化措施：向 ArrayList 添加大量元素之前最好先使用`ensureCapacity` 方法，以减少增量重新分配的次数
 
 ## CopyOnWriteArrayList
 
 CopyOnWriteArrayList 类的所有可变操作（add，set等等）都是通过创建底层数组的新副本来实现的。当 List 需要被修改的时候，我并不修改原有内容，而是对原有数据进行一次复制，将修改的内容写入副本。写完之后，再将修改完的副本替换原来的数据，这样就可以保证写操作不会影响读操作了。
-
-
 
 ## LinkedList
 
