@@ -117,6 +117,11 @@ SELECT c FROM t WHERE c BETWEEN 10 and 20 FOR UPDATE;
 
 ## left join、right join、inner join、full join
 
+## 查询前n名的sql语句
+
+select a.s_id,a.c_id,a.s_score from score a 
+where (select COUNT(1) from score b where b.c_id=a.c_id and b.s_score>=a.s_score)<=2 ORDER BY a.c_id
+
 ## limit 20000，10如何优化
 
 使用索引，假如order by id；

@@ -232,7 +232,6 @@ class Bean{
 2. 从变量在内存中的存储方式来看，成员变量是对象的一部分，而对象存在于堆内存，局部变量存在于栈内存
 3. 从变量在内存中的生存时间上看，成员变量是对象的一部分，它随着对象的创建而存在，而局部变量随着方法的调用而自动消失。
 4. 成员变量如果没有被赋初值，则会自动以类型的默认值而赋值（一种情况例外被 final 修饰的成员变量也必须显示地赋值）；而局部变量则不会自动赋值。
-5. 
 
 ## 构造方法有哪些特性
 
@@ -388,7 +387,9 @@ select和epoll最大的区别就是：select只是告诉你一定数目的流有
 
 asynchronous I/O：不需要等待数据，数据好了会自动通知
 
-![è¿éåå¾çæè¿°](https://img-blog.csdn.net/20151119165257068)
+![nio-vs-io-3.png](http://tutorials.jenkov.com/images/java-nio/nio-vs-io-3.png)
+
+![nio-vs-io-4.png](http://tutorials.jenkov.com/images/java-nio/nio-vs-io-4.png)
 
 ## IO模型对应的问题
 
@@ -526,7 +527,7 @@ CAS适用于写比较少的情况下（多读场景，冲突一般较少），sy
 
 (有锁但不存在竞争，锁多余)：JVM编译优化，将不存在数据竞争的锁消除
 
-#### 锁粗话
+#### 锁粗化
 
 ![img](https://img-blog.csdn.net/20180410165014655)
 
@@ -954,24 +955,6 @@ LinkedList 底层使用的是双向链表数据结构（JDK1.6之前为循环链
 
    实现了RandomAccess接口的list，优先选择普通for循环 ，其次foreach,
    未实现RandomAccess接口的list， 优先选择iterator遍历（foreach遍历底层也是通过iterator实现的），大size的数据，千万不要使用普通for循环
-
-   ## 集合框架底层数据结构总结
-
-   1. List
-       Arraylist：数组（查询快,增删慢 线程不安全,效率高 ）
-       Vector：数组（查询快,增删慢 线程安全,效率低 ）
-       LinkedList：链表（查询慢,增删快 线程不安全,效率高 ）
-   2. Set
-       HashSet（无序，唯一）:哈希表或者叫散列集(hash table)
-       LinkedHashSet：链表和哈希表组成 。 由链表保证元素的排序 ， 由哈希表证元素的唯一性
-       TreeSet（有序，唯一）：红黑树(自平衡的排序二叉树。)
-   - Map
-     HashMap：基于哈希表的Map接口实现（哈希表对键进行散列，Map结构即映射表存放键值对）
-     LinkedHashMap:HashMap 的基础上加上了链表数据结构
-     HashTable:哈希表
-     TreeMap:红黑树（自平衡的排序二叉树）
-
-   
 
 # 设计模式
 
