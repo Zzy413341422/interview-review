@@ -357,21 +357,10 @@ String s = input.readLine();
 
 java.io.InputStream；java.io.OutputStream；java.io.Reader；java.io.Writer
 
-### FileInputStream和FileOutputStream是什么？
+### BufferedInputStream优势
 
-这是在拷贝文件操作的时候，经常用到的两个类。在处理小文件的时候，它们性能表现还不错，在大文件的时候，最好使用BufferedInputStream (或 BufferedReader) 和 BufferedOutputStream (或 BufferedWriter)
-
-### 字节流和字符流，你更喜欢使用拿一个？
-
-个人来说，更喜欢使用字符流，因为他们更新一些。许多在字符流中存在的特性，字节流中不存在。比如使用BufferedReader而不是BufferedInputStreams或DataInputStream，使用newLine()方法来读取下一行，但是在字节流中我们需要做额外的操作。
-
-### System.out.println()是什么？
-
-println是PrintStream的一个方法。out是一个静态PrintStream类型的成员变量，System是一个java.lang包中的类，用于和底层的操作系统进行交互。
-
-### 在文件拷贝的时候，那一种流可用提升更多的性能？
-
-在字节流的时候，使用BufferedInputStream和BufferedOutputStream。  在字符流的时候，使用BufferedReader 和 BufferedWriter
+如果input用read()方法读取一个文件，每读取一个字节就要访问一次硬盘，这种读取的方式效率是很低的。即便使用read(byte b[])方法一次读取多个字节，当读取的文件较大时，也会频繁的对磁盘操作。
+Buffered类初始化时会创建一个较大的byte数组，一次性从底层输入流中读取多个字节来填充byte数组，当程序读取一个或多个字节时，可直接从byte数组中获取，当内存中的byte读取完后，会再次用底层输入流填充缓冲区数组。
 
 ##  BIO,NIO,AIO,IO多路复用
 
