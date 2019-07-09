@@ -12,6 +12,10 @@ git config --global user.email johndoe@example.com
 
 要检查已有的配置信息，可以使用 `git config --list` 命令。
 
+## git如何拉取指定分支的代码
+
+git clone -b develop XXX 
+
 ## git 切换远程分支
 
 git checkout -b dev origin/dev
@@ -19,6 +23,8 @@ git checkout -b dev origin/dev
 ## 取消已经暂存的文件
 
 git reset HEAD <file>
+
+git push -f
 
 ## 合并分支：
 

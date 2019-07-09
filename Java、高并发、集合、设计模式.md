@@ -364,18 +364,33 @@ Buffered类初始化时会创建一个较大的byte数组，一次性从底层�
 
 ##  BIO,NIO,AIO,IO多路复用
 
-blocking-IO：等待数据的过程中进程是阻塞的；
+BIO
+用上面的概念理解一下，write和read方法调用不会直接返回，而且还会把当前线程挂起来。这个有趣了，当前线程挂起还怎么操作呢？写和读其实都需要内核线程操作，内核线程在读和写的时候用户线程被挂起了。 
+BIO 在这两个步骤都是做不了其他事情的，在用户程序中看起来就是卡死。第一个步骤中用户线程阻塞挂起，第二个步骤中用户线程去从内核空间拷贝来用户空间。
 
-No-blocking-IO：等待数据的过程中不断的主动询问数据好了没有；
+![è¿éåå¾çæè¿°](https://img-blog.csdn.net/20180810100650321?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzMzMzMwNjg3/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70)
 
-I/O多路复用：建立一个代理（select，epoll）监控请求，没请求则阻塞;
+NIO
+NIO把第一个步骤分成多个小阻塞，本来第一个步骤是一个大阻塞，现在分为多个小阻塞(”检查“)，这样当前线程就会一直轮询，类似于CAS，不挂起线程但是cpu一直跑，没有数据的准备阶段十分浪费资源
+但是第二部分还是需要用户线程去copy
 
-信号驱动IO：当数据报准备好读取时，内核就为该进程产生一个SIGIO信号
+![è¿éåå¾çæè¿°](https://img-blog.csdn.net/20180810100705757?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzMzMzMwNjg3/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70)
 
-select和epoll最大的区别就是：select只是告诉你一定数目的流有事件了，至于哪个流有事件，还得你一个一个地去轮询，而epoll会把发生的事件告诉你，通过发生的事件，就自然而然定位到哪个流了。 
+多路复用 
+多路复用采用的操作系统底层的模型，select poll epoll模型，想比于上面的NIO模式，这个能处理多个IO请求上述NIO在第一阶段一直轮询是否数据准备好，浪费大量cpu，如果多个NIO，那么就多个线程一起轮询。所以引发出IO复用模式，调用底层的select poll epoll等函数，让操作系统去轮询，查询到一个或者多个就返回。如果一个都没有还是会阻塞，本质上就是把轮询交给了内核。现在大部分Linux系统采用epoll模式，例如:Java NIO网络编程中，调用select方法，其本质上调用epoll_wait返回准备好的IO。这个的好处在于一个单独线程就能调度很多IO请求业务。轮询交给了内核。
+第二部分还是得用户线程去copy回数据到用户空间。但是采用直接内存空间，做内存映射就能做到零拷贝节约这一次的时间
 
-asynchronous I/O：不需要等待数据，数据好了会自动通知
+![è¿éåå¾çæè¿°](https://img-blog.csdn.net/2018081010071978?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzMzMzMwNjg3/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70)
 
+AIO
+AIO这边就程序一调用read就离开返回，然后写好回调函数，或者返回future，两种模式回调式和将来式，IO两个步骤都是内核去完成和用户线程没关系，内核完成之后通知下用户线程。这意味着AIO两个步骤都能做自己的事情。
+
+![è¿éåå¾çæè¿°](https://img-blog.csdn.net/20180810100728217?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzMzMzMwNjg3/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70)
+总结
+同步就是上述两个过程都阻塞了
+非阻塞就是上述第一个过程你没有阻塞，但是用户线程必须不断的询问os，类似于CAS，cpu疯狂占用，数据是否从磁盘拷贝到内和空间了，如果拷贝好了，则在数据复制的过程阻塞。所以所有的同步过程，在第二阶段都是阻塞的，尽管这是非阻塞的调用。
+多路复用：和非阻塞一样，在第二阶段也是阻塞的，但是第一阶段不再由自己去询问操作系统，而是统一交给一个内核线程去处理，现在才有epoll模型，这个比较快，但是没有事件准备好的情况下还是会阻塞，当你的数据读取完成，这个线程就发送一个信号给原先发起系统调用的用户线程，并开始数据拷贝了。
+异步：上述两个过程都是非阻塞的。
 ![nio-vs-io-3.png](http://tutorials.jenkov.com/images/java-nio/nio-vs-io-3.png)
 
 ![nio-vs-io-4.png](http://tutorials.jenkov.com/images/java-nio/nio-vs-io-4.png)
