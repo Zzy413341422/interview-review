@@ -138,7 +138,7 @@ AOP核心就是切面，它将多个类的通用行为封装成可重用的模�
 
 #### 实现声明式事务的方式：
 
-**基于 @Transactional 的全注解方式：** 将声明式事务管理简化到了极致。开发人员只需在配置文件中加上一行启用相关后处理 Bean 的配置，然后在需要实施事务管理的方法或者类上使用 @Transactional 指定事务规则即可实现事务管理，而且功能也不必其他方式逊色。
+**基于 @Transactional 的全注解方式：** 将声明式事务管理简化到了极致。开发人员只需在配置文件中加上一行启用相关后处理 Bean 的配置，然后在需要实施事务管理的方法或者类上使用 @Transactional 指定事务规则即可实现事务管理，而且功能也不比其他方式逊色。
 
 **@Transactional**(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, readOnly = **false**, timeout = -1) （Isolation设置隔离级别）
 

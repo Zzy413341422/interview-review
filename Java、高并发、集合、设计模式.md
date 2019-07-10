@@ -141,9 +141,7 @@ String 中的对象是不可变的，也就可以理解为常量，线程安全�
 每次对 String 类型进行改变的时候，都会生成一个新的 String 对象，然后将指针指向新的 String 对象。StringBuffer 每次都会对 StringBuffer 对象本身进行操作，而不是生成新的对象并改变对象引用。相同情况下使用 StirngBuilder 相比使用 StringBuffer 仅能获得 10%~15% 左右的性能提升，但却要冒多线程不安全的风险。
 
 对字符串进行拼接操作，也就是做"+"运算的时候，分2中情况：
-
-i.表达式右边是纯字符串常量，那么存放在栈里面。
-
+i.表达式右边是纯字符串常量，那么存放在常量池里面。
 ii.表达式右边如果存在字符串引用，也就是字符串对象的句柄，那么就存放在堆里面
 
 ## 浅拷贝和深拷贝
@@ -490,12 +488,11 @@ CAS适用于写比较少的情况下（多读场景，冲突一般较少），sy
 
 #### 谈谈 synchronized和ReenTrantLock 的区别
 
-① 两者都是可重入锁
-② synchronized 依赖于 JVM 而 ReenTrantLock 依赖于 API
-③ ReenTrantLock 比 synchronized 增加了一些高级功能
-相比synchronized，ReenTrantLock增加了一些高级功能。主要来说主要有三点：1.等待可中断；2.可实现公平锁；3.通知结果
-
-③.synchroniezd执行完自动释放锁，ReenTrantLock需要unlock
+1.两者都是可重入锁，都保证了可见性和互斥性
+2.synchronized 依赖于 JVM 而 ReenTrantLock 依赖于 API
+3.ReenTrantLock一.等待可中断；二.可实现公平锁；
+4.synchroniezd执行完自动释放锁，ReenTrantLock需要unlock
+5.synchroniezd可以修饰类和用在代码块
 
 #### Reentrantreadwitelock（读写锁）
 
@@ -554,7 +551,6 @@ CAS适用于写比较少的情况下（多读场景，冲突一般较少），sy
 
 synchronized关键字和volatile关键字比较
 1.volatile关键字是线程同步的轻量级实现，所以volatile性能肯定比synchronized关键字要好。
-
 2.但是volatile关键字只能用于变量而synchronized关键字可以修饰方法以及代码块。
 3.多线程访问volatile关键字不会发生阻塞，而synchronized关键字可能会发生阻塞
 4.volatile不能保证数据的原子性。synchronized关键字能保证。
@@ -991,17 +987,15 @@ public class Singleton4 {
 
 #### 工厂模式：
 
-工厂方法模式：**将创建对象的职责委托给了多个子类中的一个**
+工厂模式：**封装隐藏创建过程，降低耦合**
 
-抽象方法模式：**将工厂的创建能力拓展到产品族**
+抽象工厂模式：**将工厂的创建能力拓展到产品族**
+
+区别：每个具体**工厂**类只能创建一个具体产品类的实例，每个具体**工厂**类可以创建多个具体产品类的实例。
 
 #### 建造者模式：
 
 **建造者模式仅仅关心构造一个完整复杂产品的步骤，而不关心生产细节**
-
-#### 原型模式：
-
-**通过“复制”来获得对象**
 
 ## 结构性模式
 
@@ -1014,8 +1008,6 @@ public class Singleton4 {
 代理模式：**对真实对象进行隐藏，封装**
 
 组合模式：**用于描述“整体-部分”的概念**
-
-桥接模式：**将抽象与实现进行分离**
 
 #### 代理模式：
 
@@ -1073,7 +1065,7 @@ public class VoltAdapter implements Volt5 {
 
 #### 外观模式：
 
-![1553231396721](C:\Users\admin\AppData\Roaming\Typora\typora-user-images\1553231396721.png)
+![../_images/Facade.jpg](https://design-patterns.readthedocs.io/zh_CN/latest/_images/Facade.jpg)
 
 #### 组合模式：
 
@@ -1086,10 +1078,6 @@ public class Employee {
 }
 ```
 
-#### 桥接模式：
-
-![img](https://img-my.csdn.net/uploads/201206/17/1339921135_8442.png)
-
 ## 行为型模式
 
 #### 观察者模式：
@@ -1097,17 +1085,47 @@ public class Employee {
 发布订阅模式
 
 ```java
-public class WechatServer implements Observerable {
-    
-    //注意到这个List集合的泛型参数为Observer接口，设计原则：面向接口编程而不是面向实现编程
-    private List<Observer> list;
+public class Subject {
+   
+   private List<Observer> observers 
+      = new ArrayList<Observer>();
+   private int state;
+ 
+   public int getState() {
+      return state;
+   }
+ 
+   public void setState(int state) {
+      this.state = state;
+      notifyAllObservers();
+   }
+ 
+   public void attach(Observer observer){
+      observers.add(observer);      
+   }
+ 
+   public void notifyAllObservers(){
+      for (Observer observer : observers) {
+         observer.update();
+      }
+   }  
+}
+
+class BinaryObserver extends Observer{
+ 
+   public BinaryObserver(Subject subject){
+      this.subject = subject;
+      this.subject.attach(this);
+   }
+ 
+   @Override
+   public void update() {
+      System.out.println( "Binary String: " 
+      + Integer.toBinaryString( subject.getState() ) ); 
+   }
 }
 ```
 
 #### 迭代器模式：
 
-迭代器模式就是分离了集合对象的遍历行为，抽象出一个迭代器类来负责
-
-#### 策略模式：
-
-准备一组算法，并将每一个算法封装起来，使得它们可以互换			
+迭代器模式就是分离了集合对象的遍历行为，抽象出一个迭代器类来负责	
