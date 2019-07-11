@@ -89,7 +89,7 @@ redo日志记录数据修改后的值
 
 ## MVCC(多版本并发控制)
 
-MVCC主要适用于Mysql的RC,RR隔离级别
+InnoDB**基于行锁**还实现了MVCC多版本并发控制,MVCC主要适用于Mysql的RC,RR隔离级别
 
 在每一行数据中额外保存两个隐藏的列：create version和delete version
 
@@ -103,17 +103,24 @@ MVCC主要适用于Mysql的RC,RR隔离级别
 
 ## 数据库锁粒度大会引发什么问题
 
-锁粒度分为行锁、页锁、表锁；只有在索引查询下才会用到行锁；
+![img](https://user-gold-cdn.xitu.io/2018/7/23/164c6d7ae44d8ac6?imageView2/0/w/1280/h/960/format/webp/ignore-error/1)
 
-锁类型有：排他锁，共享锁；select ... for update;select ... in share mode;
+- 对于`UPDATE、DELETE、INSERT`语句，**InnoDB**会**自动**给涉及数据集加排他锁（X)
 
-## 间隙锁
+  **MyISAM**在执行查询语句`SELECT`前，会**自动**给涉及的所有表加**读锁**，在执行更新操作（`UPDATE、DELETE、INSERT`等）前，会**自动**给涉及的表加**写锁**，这个过程并**不需要用户干预**
 
-锁定索引之间的间隙，但是不包含索引本身。例如当一个事务执行以下语句，其它事务就不能在 t.c 中插入 15。
+- 共享锁（S）：`SELECT * FROM table_name WHERE ... LOCK IN SHARE MODE`。
 
-```
-SELECT c FROM t WHERE c BETWEEN 10 and 20 FOR UPDATE;
-```
+- 排他锁（X)：`SELECT * FROM table_name WHERE ... FOR UPDATE`。
+
+- 间隙锁  :SELECT c FROM t WHERE c BETWEEN 10 and 20 FOR UPDATE;
+
+允许多个线程同时对想读的内容加锁,即共享锁或叫S锁),写的时候不*能*读
+
+InnoDB实现的`Repeatable read`隔离级别配合GAP间隙锁已经避免了幻读！
+
+- 乐观锁其实是一种思想，正如其名：认为不会锁定的情况下去更新数据，如果发现不对劲，才不更新(回滚)。在数据库中往往添加一个version字段来实现。
+- 悲观锁用的就是数据库的行锁，认为数据库会发生并发冲突，直接上来就把数据锁住，其他事务不能修改，直至提交了当前事务
 
 ## left join、right join、inner join、full join
 
