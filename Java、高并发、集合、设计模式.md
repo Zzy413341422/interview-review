@@ -146,9 +146,13 @@ ii.表达式右边如果存在字符串引用，也就是字符串对象的句�
 
 ## 浅拷贝和深拷贝
 
-浅拷贝：拷贝对象和原始对象的引用类型引用同一个对象。
+1、浅拷贝：对基本数据类型进行值传递，对引用数据类型进行引用传递般的拷贝，此为浅拷贝。
 
-深拷贝：拷贝对象和原始对象的引用类型引用不同对象。
+![/clone-qian.png](http://ww2.sinaimg.cn/large/006tKfTcly1fij5l5nx2mj30e304o3yn.jpg)
+
+2、深拷贝：对基本数据类型进行值传递，对引用数据类型，创建一个新的对象，并复制其内容，此为深拷贝。
+
+![/clone-深.png](http://ww1.sinaimg.cn/large/006tKfTcly1fij5l1dm3uj30fs05i74h.jpg)
 
 ## 自动装箱与拆箱
 
@@ -176,8 +180,6 @@ public enum  ResultEnum {
     }
 }
 ```
-
-
 
 ## 内部类，静态内部类
 
@@ -486,6 +488,13 @@ Collections.sort(stus,new Comparator<Student>() {
 
 CAS适用于写比较少的情况下（多读场景，冲突一般较少），synchronized适用于写比较多的情况下（多写场景，冲突一般较多）
 
+#### ReentrantLock的基本实现
+
+先通过CAS尝试获取锁。如果此时已经有线程占据了锁，那就加入CLH队列并且被挂起。当锁被释放之后，排在CLH队列队首的线程会被唤醒，然后CAS再次尝试获取锁。在这个时候，如果：
+
+- 非公平锁：如果同时还有另一个线程进来尝试获取，那么有可能会让这个线程抢先获取；
+- 公平锁：如果同时还有另一个线程进来尝试获取，当它发现自己不是在队首的话，就会排到队尾，由队首的线程获取到锁。
+
 #### 谈谈 synchronized和ReenTrantLock 的区别
 
 1.两者都是可重入锁，都保证了可见性和互斥性
@@ -601,7 +610,15 @@ RejectedExecutionHandler类型的变量，表示线程池的饱和策略。
 
 设置最大线程数，防止线程资源耗尽； 
 使用有界队列，从而增加系统的稳定性和预警能力(饱和策略)； 
-根据任务的性质设置线程池大小：CPU密集型任务(CPU个数个线程)，IO密集型任务(CPU个数两倍的线程)，混合型任务(拆分)。
+根据任务的性质设置线程池大小：
+
+##### CPU密集型任务(CPU个数个线程+1)
+
+计算密集型，顾名思义就是应用需要非常多的CPU计算资源，在多核CPU时代，我们要让每一个CPU核心都参与计算，将CPU的性能充分利用起来
+
+##### IO密集型任务(CPU个数两倍的线程)
+
+于IO密集型的应用，就很好理解了，我们现在做的开发大部分都是WEB应用，涉及到大量的网络传输，不仅如此，与数据库，与缓存间的交互也涉及到IO，一旦发生IO，线程就会处于等待状态，当IO结束，数据准备好后，线程才会继续执行。因此从这里可以发现，对于IO密集型的应用，我们可以多设置一些线程池中线程的数量，这样就能让在等待IO的这段时间内，线程可以去做其它事，提高并发处理效率。
 
 #### 实现Runnable接口和Callable接口的区别
 
@@ -985,6 +1002,27 @@ public class Singleton4 {
 }
 ```
 
+```
+public class Singleton {
+    private Singleton(){
+    }
+    public static Singleton getInstance(){
+        return SingletonHolder.INSTANCE;
+    }
+    private static class SingletonHolder {
+        private static final Singleton INSTANCE = new Singleton();
+    }
+}
+```
+
+```
+public enum Singleton {
+    INSTANCE;
+    public void doSth(){
+        //do stuff
+    }
+}
+```
 #### 工厂模式：
 
 工厂模式：**封装隐藏创建过程，降低耦合**
@@ -992,10 +1030,6 @@ public class Singleton4 {
 抽象工厂模式：**将工厂的创建能力拓展到产品族**
 
 区别：每个具体**工厂**类只能创建一个具体产品类的实例，每个具体**工厂**类可以创建多个具体产品类的实例。
-
-#### 建造者模式：
-
-**建造者模式仅仅关心构造一个完整复杂产品的步骤，而不关心生产细节**
 
 ## 结构性模式
 

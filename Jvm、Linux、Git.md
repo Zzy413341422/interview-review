@@ -137,7 +137,7 @@ GC Roots：
 ## Minor Gc和Full GC 有什么不同呢？
 
 Minor GC:从年轻代空间（包括 Eden 和 Survivor 区域）回收内存
-Major GC:只收集old gen
+Major GC:只收集老年代
 Full GC:收集整个堆
 
 ## 什么时候触发MinorGC?什么时候触发FullGC?
@@ -190,11 +190,27 @@ Full GC：
 
 ## 双亲委派模型的工作过程以及使用它的好处。
 
-采用双亲委派模式的是好处是Java类随着它的类加载器一起具备了一种带有优先级的层次关系，通过这种层级关可以避免类的重复加载，当父亲已经加载了该类时，就没有必要子ClassLoader再加载一次。其次是考虑到安全因素，java核心api中定义类型不会被随意替换，假设通过网络传递一个名为java.lang.Integer的类，通过双亲委托模式传递到启动类加载器，而启动类加载器在核心Java API发现这个名字的类，发现该类已被加载，并不会重新加载网络传递的过来的java.lang.Integer，而直接返回已加载过的Integer.class，这样便可以防止核心API库被随意篡改。
+AppClassLoader应用类加载器,又称为系统类加载器,负责在JVM启动时,加载来自在命令java中的classpath的jar包
+
+ExtClassLoader称为扩展类加载器，主要负责加载Java的扩展类库,默认加载JAVA_HOME/jre/lib/ext/目录下的所有jar包
+
+BootstrapClassLoader：Java类加载层次中最顶层的类加载器，负责加载JDK中的核心类库
 
 ## 如何破坏双亲委派模型
 
-1：自己写一个类加载器	2：重写loadclass方法(打破模型)	3：重写findclass方法(自定义类加载器不打破模型)
+打破双亲委派机制则不仅要继承ClassLoader类，还要重写loadClass和findClass方法
+
+沿用双亲委派机制自定义类加载器很简单，只需继承ClassLoader类并重写findClass方法即可。
+
+## 热部署为什么要自定义类加载器
+
+class文件被修改过，那么先卸载对应class类加载器，重新启动，然后就会重新加载类。
+
+## tomcat为什么要自定义类加载器
+
+一个web容器可能需要部署两个应用程序，不同的应用程序可能会依赖同一个第三方类库的不同版本，如果使用默认的类加载器机制，那么是无法加载两个相同类库的不同版本的，由全限定类名决定，并且只有一份。
+
+web容器也有自己依赖的类库，不能于应用程序的类库混淆。
 
 ## Jvm调优
 

@@ -22,7 +22,7 @@
 时间方面：创建索引和维护索引要耗费时间
 空间方面：索引需要占物理空间。
 
-## 索引有哪些？聚簇（聚集）索引和非聚簇索引的区别？
+## 索引有哪些？聚集索引和非聚集索引的区别？
 
 FULLTEXT，HASH，BTREE，RTREE。
 
@@ -37,7 +37,12 @@ FULLTEXT，HASH，BTREE，RTREE。
 
 ## 建立联合索引a,b,c，请问查询条件为a,c是否使用索引？a,b是否使用索引？b,a,c是否使用索引？
 
-与位置无关，会自动调换位置，有a则会使用联合索引。
+***最左前缀原则：***以**最左边的为起点**任何连续的索引都能匹配上
+
+**联合索引本质：**
+
+当创建**(a,b,c)联合索引**时，相当于创建了**(a)单列索引**，**(a,b)联合索引**以及**(a,b,c)联合索引**
+想要索引生效的话,只能使用 a和a,b和a,b,c三种组合；当然，我们上面测试过，**a,c组合也可以，但实际上只用到了a的索引，c并没有用到！**
 
 使用or：索引失效。
 
@@ -66,12 +71,10 @@ B+tree的查询效率更加稳定；
 ## 数据库引擎有哪些？InnoDB和MyIsam有啥区别?
 
 MyISAM InnoDB MEMORY MERGE NDB；
-
 MyISAM是非事务安全型的，而InnoDB是事务安全型的，
 MyISAM锁的粒度是表级，而InnoDB支持行级锁定。
 MyISAM相对简单，所以在效率上要优于InnoDB
 MyISAM不支持外健，InnoDB支持。
-MyISAM的B-Tree索引是非聚簇索引，InnoDB是聚簇索引
 
 ## mysql实现事务的原理
 
@@ -131,21 +134,7 @@ where (select COUNT(1) from score b where b.c_id=a.c_id and b.s_score>=a.s_score
 
 ## limit 20000，10如何优化
 
-使用索引，假如order by id；
-
-## Mysql架构
-
-- **连接器：** 身份认证和权限相关(登录 MySQL 的时候)。
-
-- **查询缓存:** 执行查询语句的时候，会先查询缓存（MySQL 8.0 版本后移除，因为这个功能不太实用）。
-
-- **分析器:** 没有命中缓存的话，SQL 语句就会经过分析器，分析器说白了就是要先看你的 SQL 语句要干嘛，再检查你的 SQL 语句语法是否正确。
-
-- **优化器：** 按照 MySQL 认为最优的方案去执行。
-
-- **执行器:** 执行语句，然后从存储引擎返回数据。
-
-  ![img](https://camo.githubusercontent.com/7ef46ccad045efe1f2aadedcabbc69bb3f4108b9/68747470733a2f2f757365722d676f6c642d63646e2e786974752e696f2f323031392f332f32332f313639613862633630613038333834393f773d39353026683d3130363226663d6a70656726733d3338313839)
+SELECT id,title,content **FROM** items **WHERE** id IN (**SELECT** id **FROM** items **ORDER** **BY** id limit 900000, 10);  
 
 ## 一个 SQL 执行的很慢的原因
 
@@ -271,7 +260,7 @@ char是一种固定长度的类型，varchar则是一种可变长度的类型
 
 ## 什么是Redis？
 
-Redis本质上是一个Key-Value类型的内存数据库,因为是纯内存操作，Redis的性能非常出色，每秒可以处理超过 10万次读写操作，是已知性能最快的Key-Value DB,。
+Redis本质上是一个Key-Value类型的内存数据库,因为是纯内存操作，Redis的性能非常出色，每秒可以处理超过 10万次读写操作，是已知性能最快的Key-Value DB。
 
 ## Redis相比memcached有哪些优势?
 
@@ -384,21 +373,17 @@ Redis可以通过创建快照来获得存储在内存里面的数据在某个时
 
 一般使用list结构作为队列，rpush生产消息，lpop消费消息。当lpop没有消息的时候，要适当sleep一会再重试。
 
-### 如果对方追问可不可以不用sleep呢？
+## redis如何实现延时队列？
 
-list还有个指令叫blpop，在没有消息的时候，它会阻塞住直到消息到来。
+ZRANGEBYSCORE list min max
 
-### 如果对方追问能不能生产一次消费多次呢？
+## redis如何实现排行榜？
 
-使用pub/sub主题订阅者模式，可以实现1:N的消息队列。
+zadd list A score;
 
-### 如果对方追问pub/sub有什么缺点？
+zrevrange list 0 -1 with scores;
 
-在消费者下线的情况下，生产的消息会丢失，得使用专业的消息队列如rabbitmq等。
-
-### 如果对方追问redis如何实现延时队列？
-
-使用sortedset，拿时间戳作为score，消息内容作为key调用zadd来生产消息，消费者用zrangebyscore指令获取N秒之前的数据轮询进行处理。
+zincrby list score A;
 
 ## 是否使用过Redis集群，集群的原理是什么？
 
