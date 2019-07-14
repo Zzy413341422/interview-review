@@ -27,9 +27,7 @@ JSP本质上是Servlet的一种简易形式，JSP会被服务器处理成一个�
 
 # Jvm虚拟机
 
-## JVM加载代码的一个流程
-
-## 介绍下Java内存区域。
+## 介绍下Java内存区域
 
 ![img](https://camo.githubusercontent.com/a66819fd82c6adfa69b368edf3c52b1fa9cdc89d/68747470733a2f2f6d792d626c6f672d746f2d7573652e6f73732d636e2d6265696a696e672e616c6979756e63732e636f6d2f323031392d332f4a564de8bf90e8a18ce697b6e695b0e68daee58cbae59f9f2e706e67)
 
@@ -165,20 +163,6 @@ Full GC：
 
 ![ç±»å è½½è¿ç¨-11.2kB](http://static.zybuluo.com/Rico123/ojhhtids41ivtuowfj74mkb2/%E7%B1%BB%E5%8A%A0%E8%BD%BD%E8%BF%87%E7%A8%8B)
 
-## 类加载和类初始化
-
-1、加载（Loading）
-	在加载阶段（可以参考java.lang.ClassLoader的loadClass()方法），虚拟机需要完成以下三件事情：
-	(1). 通过一个类的全限定名来获取定义此类的二进制字节流（并没有指明要从一个Class文件中获取，可以从其他渠道，譬如：网络、动态生成、数据库等）；
-
-​	(2). 将这个字节流所代表的静态存储结构转化为方法区的运行时数据结构；
-
-​	(3). 在内存中(对于HotSpot虚拟就而言就是方法区)生成一个代表这个类的java.lang.Class对象，作为方法区这个类的各种数据的访问入口；
-
-5、初始化(Initialization)
-
-​	初始化阶段是执行类构造器<clinit>()方法的过程。
-
 ## 类的实例化与类的初始化
 
 - 类的实例化是指创建一个类的实例(对象)的过程；
@@ -188,7 +172,7 @@ Full GC：
 
 ![ClassLoader](https://camo.githubusercontent.com/4311721b0968c1b9fd63bdc0acf11d7358a52ff6/68747470733a2f2f6d792d626c6f672d746f2d7573652e6f73732d636e2d6265696a696e672e616c6979756e63732e636f6d2f323031392d362f636c6173736c6f616465725f5750532545352539422542452545372538392538372e706e67)
 
-## 双亲委派模型的工作过程以及使用它的好处。
+## 双亲委派模型
 
 AppClassLoader应用类加载器,又称为系统类加载器,负责在JVM启动时,加载来自在命令java中的classpath的jar包
 
@@ -211,15 +195,6 @@ class文件被修改过，那么先卸载对应class类加载器，重新启动�
 一个web容器可能需要部署两个应用程序，不同的应用程序可能会依赖同一个第三方类库的不同版本，如果使用默认的类加载器机制，那么是无法加载两个相同类库的不同版本的，由全限定类名决定，并且只有一份。
 
 web容器也有自己依赖的类库，不能于应用程序的类库混淆。
-
-## Jvm调优
-
--Xms:初始堆大小
--Xmx:最大堆大小
--XX:NewSize=n:设置年轻代大小
--XX:NewRatio=n:设置年轻代和年老代的比值。如:为3，表示年轻代与年老代比值为1：3，年轻代占整个年轻代年老代和的1/4
--XX:SurvivorRatio=n:年轻代中Eden区与两个Survivor区的比值。注意Survivor区有两个。如：3，表示Eden：Survivor=3：2，一个Survivor区占整个年轻代的1/5
--XX:MaxPermSize=n:设置持久代大小
 
 #### 调优工具：
 
@@ -294,7 +269,7 @@ Jconsole：可以以图表化的形式显示各种数据
 
 ps -ef|grep 
 
-kill -p 
+kill -9 
 
 top P,M
 

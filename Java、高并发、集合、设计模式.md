@@ -4,6 +4,8 @@
 
 
 
+
+
 # JAVA基础
 
 ## 机器码和字节码区别
@@ -43,12 +45,6 @@
 ![img](https://camo.githubusercontent.com/d913ab9b3880feab7d326a0904caac5f5e285a56/687474703a2f2f6d792d626c6f672d746f2d7573652e6f73732d636e2d6265696a696e672e616c6979756e63732e636f6d2f31382d392d31352f38363733353531392e6a7067)
 
 Character,    Byte，Short，Long 的缓存池范围默认都是: -128 到 127。
-
-## JAVA中为什么需要代理？
-
-1.方便远程调用类
-
-2.增强方法，面向切面编程思想
 
 ## JAVA反射，动态代理
 
@@ -112,7 +108,7 @@ equal		hashCode		wait		notify		notifyAll		toString		clone		getClass		finalize
 ## 重载和重写的区别
 
 重载： 发生在同一个类中，方法名必须相同，参数必须不同，方法返回值和访问修饰符可以不同，发生在编译时。 　　
-重写： 发生在父子类中，方法名、参数列表必须相同，返回值范围小于等于父类，抛出的异常范围小于等于父类，访问修饰符范围大于等于父类；如果父类方法访问修饰符为 private 则子类就不能重写该方法。
+重写： 发生在父子类中，方法名、参数列表必须相同，返回值范围小于等于父类，抛出的异常范围小于等于父类，访问修饰符范围大于等于父类；
 
 ## Java 面向对象编程三大特性:封装、继承、多态
 
@@ -577,9 +573,9 @@ synchronized关键字和volatile关键字比较
 ①SingleThreadExecutor
 单个线程的线程池，即线程池中每次只有一个线程工作，单线程串行执行任务
 ②FixedThreadExecutor(n)
-固定数量的线程池，没提交一个任务就是一个线程，直到达到线程池的最大数量，然后后面进入等待队列直到前面的任务完成才继续执行
+只有核心线程的线程池,大小固定 (其缓冲队列是无界的) 。
 ③CacheThreadExecutor（推荐使用）
-可缓存线程池，当线程池大小超过了处理任务所需的线程，那么就会回收部分空闲（一般是60秒无执行）的线程，当有任务来时，又智能的添加新线程来执行。
+无界线程池，可以进行自动线程回收。
 ④ScheduleThreadExecutor
 定时任务线程池
 
@@ -592,6 +588,8 @@ maximumPoolSize-池中允许的最大线程数。
 keepAliveTime - 当线程数大于核心时，此为终止前多余的空闲线程等待新任务的最长时间。
 
 unit  keepAliveTime参数的时间单位
+
+BlockingQueue<Runnable>：阻塞队列
 
 threadFactory 执行者创建新线程时使用的工厂
 
@@ -659,69 +657,9 @@ FutureTask <Integer> result2 = mExecutor.submit(new Callable<Integer>() {
 
 ## Atom:
 
-#### JUC 包中的原子类是哪4类?
-
-基本类型
-使用原子的方式更新基本类型
-AtomicInteger：整形原子类
-AtomicLong：长整型原子类
-AtomicBoolean ：布尔型原子类
-数组类型
-使用原子的方式更新数组里的某个元素
-AtomicIntegerArray：整形数组原子类
-AtomicLongArray：长整形数组原子类
-AtomicReferenceArray ：引用类型数组原子类
-引用类型
-AtomicReference：引用类型原子类
-AtomicStampedRerence：原子更新引用类型里的字段原子类
-AtomicMarkableReference ：原子更新带有标记位的引用类型
-对象的属性修改类型
-AtomicIntegerFieldUpdater:原子更新整形字段的更新器
-AtomicLongFieldUpdater：原子更新长整形字段的更新器
-AtomicStampedReference ：原子更新带有版本号的引用类型。该类将整数值与引用关联起来，可用于解决原子的更新数据和数据的版本号，可以解决使用 CAS 进行原子更新时可能出现的 ABA 问题。
-
-#### 讲讲 AtomicInteger 的使用
-
-AtomicInteger 类常用方法
-public final int get() //获取当前的值
-public final int getAndSet(int newValue)//获取当前的值，并设置新的值
-public final int getAndIncrement()//获取当前的值，并自增
-public final int getAndDecrement() //获取当前的值，并自减
-public final int getAndAdd(int delta) //获取当前的值，并加上预期的值
-boolean compareAndSet(int expect, int update) //如果输入的数值等于预期值，则以原子方式将该值设置为输入值（update）
-public final void lazySet(int newValue)//最终设置为newValue,使用 lazySet 设置之后可能导致其他线程在之后的一小段时间内还是可以读到旧的值。
-
-#### AtomicInteger 类的使用示例
-
-```java
-使用 AtomicInteger 之后，不用对 increment() 方法加锁也可以保证线程安全。
-class AtomicIntegerTest {
-        private AtomicInteger count = new AtomicInteger();
-      //使用AtomicInteger之后，不需要对该方法加锁，也可以实现线程安全。
-        public void increment() {
-                  count.incrementAndGet();
-        }
-       public int getCount() {
-                return count.get();
-        }
-}
-```
-
-
-
 #### AtomicInteger 线程安全原理简单分析
 
 AtomicInteger 类的部分源码：
-    // setup to use Unsafe.compareAndSwapInt for updates（更新操作时提供“比较并替换”的作用）
-    private static final Unsafe unsafe = Unsafe.getUnsafe();
-    private static final long valueOffset;
-    static {
-        try {
-            valueOffset = unsafe.objectFieldOffset
-                (AtomicInteger.class.getDeclaredField("value"));
-        } catch (Exception ex) { throw new Error(ex); }
-    }
-    private volatile int value;
 AtomicInteger 类主要利用 CAS (compare and swap) + volatile 和 native 方法来保证原子操作，从而避免 synchronized 的高开销，执行效率大为提升。
 
 #### CAS的原理:
@@ -831,6 +769,8 @@ peek        返回队列头部的元素，如果队列为空，则返回null
 ![ThreadLocalæ°æ®è¯»ååè®¾ç½®è¿ç¨](https://img-blog.csdn.net/20160722160254682)
 
 当释放掉对threadlocal对象的强引用后，map里面的value没有被回收，但却永远不会被访问到了，因此ThreadLocal存在着内存泄露问题。在不使用该ThreadLocal对象时，及时调用该对象的remove方法去移除ThreadLocal.ThreadLocalMap中的对应Entry。
+
+ThreadLocalMap 中解决 Hash 冲突的方式并非链表的方式，而是采用线性探测的方式。还有一种再散列方法；
 
 # 集合类
 
@@ -970,8 +910,8 @@ LinkedList 底层使用的是双向链表数据结构（JDK1.6之前为循环链
 
    ####  list 的遍历方式选择：
 
-   实现了RandomAccess接口的list，优先选择普通for循环 ，其次foreach,
-   未实现RandomAccess接口的list， 优先选择iterator遍历（foreach遍历底层也是通过iterator实现的），大size的数据，千万不要使用普通for循环
+   实现了RandomAccess接口的list，优先选择普通for循环 
+   未实现RandomAccess接口的list，foreach遍历
 
 # 设计模式
 

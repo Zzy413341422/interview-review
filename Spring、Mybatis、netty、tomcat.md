@@ -47,7 +47,6 @@ IOC 或 依赖注入把应用的代码量降到最低。IOC容器支持加载服
 a.接口注入
 b.setter方法注入
 c.构造方法注入
-d.注解方式注入
 
 #### 哪种依赖注入方式你建议使用，构造器注入，还是 Setter方法注入？
 
@@ -82,9 +81,7 @@ Spring框架支持以下五种bean的作用域：
 
 #### spring容器的初始化过程：
 
-![Spring IOCçåå§åè¿ç¨](https://camo.githubusercontent.com/3b07a520440ff631990c027c2437d131fba25efe/68747470733a2f2f757365722d676f6c642d63646e2e786974752e696f2f323031382f352f32322f313633383739303365653732633833313f773d37303926683d353626663d706e6726733d34363733)
-
-创建BeanFactory来装配BeanDefiniton，加工处理BeanDefiniton，注册了bean后处理器，初始化了消息资源，初始化了应用上下文事件广播器，注册了事件监听器，初始化了所有singleton的bean，最后发布上下文刷新事件
+读取xml用Resource封装，将Resource解析成BeanDefinition，创建BeanFactory来装配BeanDefiniton，加工处理BeanDefiniton，注册了bean后处理器，初始化了消息资源，初始化了应用上下文事件广播器，注册了事件监听器，初始化了所有singleton的bean，最后发布上下文刷新事件
 
 ## SpringAop
 
@@ -189,10 +186,7 @@ Spring 配备构建Web 应用的全功能MVC框架。Spring可以很便捷地和
 ![SpringMVCè¿è¡åç](https://camo.githubusercontent.com/6889f839138de730fce5f6a0d64e33258a2cf9b5/687474703a2f2f6d792d626c6f672d746f2d7573652e6f73732d636e2d6265696a696e672e616c6979756e63732e636f6d2f31382d31302d31312f34393739303238382e6a7067)
 
 #### Spring和SpringMVC的关系
-
-　　1.Spring和SpringMVC是父子容器关系。
-　　2.Spring父容器中注册的Bean对SpringMVC子容器是可见的，反之则不行。
-　　3.那么SpringMVC子容器用来注册web组件的Bean，如控制器、处理器映射、视图解析器等。而Spring用来注册其他Bean，这些Bean通常是驱动应用后端的中间层和数据层组件。
+那么SpringMVC子容器用来注册web组件的Bean，如控制器、处理器映射、视图解析器等。而Spring用来注册其他Bean，这些Bean通常是驱动应用后端的中间层和数据层组件。
 
 # Mybatis
 
@@ -284,13 +278,19 @@ acceptCount="X" 当同时连接的人数达到maxThreads时,还可以排队,队�
 
 2.传输快，零拷贝技术；
 
-2.使用主从Reactor多线程模型
+3.使用主从Reactor多线程模型
 
-3.默认使用Protobuf的序列化框架
+4.默认使用Protobuf的序列化框架
+
+#### Netty 中有那种重要组件？
+
+- ChannelPipeline：为 ChannelHandler 链提供了容器，当 channel 创建时，就会被自动分配到它专属的 ChannelPipeline，这个关联是永久性的。
+- Channel：Netty 网络操作抽象类，它除了包括基本的 I/O 操作，如 bind、connect、read、write 等。
+- ChannelHandler：充当了所有处理入站和出站数据的逻辑容器。ChannelHandler 主要用来处理各种事件，这里的事件很广泛，比如可以是连接、数据接收、异常、数据转换等。
 
 #### 零拷贝： 
 
-1.Netty的接收和发送数据采用DIRECT BUFFERS，使用堆外直接内存进行Socket读写，不用在字节缓冲区的进行二次拷贝 
+1.Netty的接收和发送数据采用DIRECT BUFFERS，使用堆外直接内存进行Socket读写，不用在字节缓冲区的进行二次拷贝，如果使用传统的堆内存（HEAP BUFFERS）进行 Socket 读写，JVM 会将堆内存 Buffer 拷贝一份到直接内存中，然后才写入 Socket 中。
 
 2.Netty提供了组合Buffer对象，可以聚合多个ByteBuffer对象进行一次操作 
 
@@ -298,7 +298,7 @@ acceptCount="X" 当同时连接的人数达到maxThreads时,还可以排队,队�
 
 #### 内存池：
 
-频繁的申请和释放内存对GC不友好，因此Netty开发了一个内存池模块用于内存的分配和回收来降低GC压力。
+频繁的申请和释放内存对GC不友好，因此Netty开发了一个内存池模块用于内存的分配和回收来降低GC压力，也就是直接内存。
 
 #### 常见的Reactor线程模型：
 
