@@ -571,11 +571,11 @@ synchronized关键字和volatile关键字比较
 #### 常见的线程池：
 
 ①SingleThreadExecutor
-单个线程的线程池，即线程池中每次只有一个线程工作，单线程串行执行任务
+核心线程数=最大线程数=1；
 ②FixedThreadExecutor(n)
-只有核心线程的线程池,大小固定 (其缓冲队列是无界的) 。
+核心线程数=最大线程数
 ③CacheThreadExecutor（推荐使用）
-无界线程池，可以进行自动线程回收。
+核心线程数=0，最大线程数=Integer.MAX_VALUE
 ④ScheduleThreadExecutor
 定时任务线程池
 
@@ -603,6 +603,10 @@ RejectedExecutionHandler类型的变量，表示线程池的饱和策略。
 3.DiscardOldestPolicy：丢弃阻塞队列中靠最前的任务，并执行当前任务；
 
 4.DiscardPolicy：直接丢弃任务；
+
+#### 线程池执行过程：
+
+![è¿éåå¾çæè¿°](https://img-blog.csdn.net/20170618213838961?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvdTAxMTI0MDg3Nw==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
 
 #### 线程池调优:
 
