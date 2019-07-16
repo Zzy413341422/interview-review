@@ -27,6 +27,8 @@ Web容器加载Servlet并将其实例化后，Servlet生命周期开始，容器
 
 ![img](https://camo.githubusercontent.com/a66819fd82c6adfa69b368edf3c52b1fa9cdc89d/68747470733a2f2f6d792d626c6f672d746f2d7573652e6f73732d636e2d6265696a696e672e616c6979756e63732e636f6d2f323031392d332f4a564de8bf90e8a18ce697b6e695b0e68daee58cbae59f9f2e706e67)
 
+![img](https://camo.githubusercontent.com/0bcc6c01a919b175827f0d5540aeec115df6c001/68747470733a2f2f6d792d626c6f672d746f2d7573652e6f73732d636e2d6265696a696e672e616c6979756e63732e636f6d2f323031392d334a617661e8bf90e8a18ce697b6e695b0e68daee58cbae59f9f4a444b312e382e706e67)
+
 - Java堆：占据了虚拟机管理内存中最大的一块（没想到吧），唯一目的就是存放对象实例（与引用是两个概念），也是垃圾回收器主要管理的地方 
 
 - 方法区：存储加载的类信息、常量区、静态变量、JIT（即时编译器）处理后的数据等，类的信息包含类的版本、字段、方法、接口等信息。需要注意是常量池就在方法区中，也是我们这次需要关注的地方。

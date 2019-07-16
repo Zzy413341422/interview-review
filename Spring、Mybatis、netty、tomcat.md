@@ -81,7 +81,7 @@ Spring框架支持以下五种bean的作用域：
 
 #### spring容器的初始化过程：
 
-读取xml用Resource封装，将Resource解析成BeanDefinition，创建BeanFactory来装配BeanDefiniton，加工处理BeanDefiniton，注册了bean后处理器，初始化了消息资源，初始化了应用上下文事件广播器，注册了事件监听器，初始化了所有singleton的bean，最后发布上下文刷新事件
+读取xml用Resource封装，将Resource解析成BeanDefinition，创建BeanFactory来装配BeanDefiniton，加工处理BeanDefiniton，注册了bean后处理器，初始化资源、广播器，然后注册事件监听器，初始化所有singleton的bean，最后发布上下文刷新事件
 
 ## SpringAop
 
