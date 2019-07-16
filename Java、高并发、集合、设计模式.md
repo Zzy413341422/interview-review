@@ -347,7 +347,7 @@ java.io.InputStream；java.io.OutputStream；java.io.Reader；java.io.Writer
 
 ### BufferedInputStream优势
 
-如果input用read()方法读取一个文件，每读取一个字节就要访问一次硬盘，这种读取的方式效率是很低的。即便使用read(byte b[])方法一次读取多个字节，当读取的文件较大时，也会频繁的对磁盘操作。
+如果input用read()方法，每读取一次就要访问一次硬盘，这种读取的方式效率是很低的。
 Buffered类初始化时会创建一个较大的byte数组，一次性从底层输入流中读取多个字节来填充byte数组，当程序读取一个或多个字节时，可直接从byte数组中获取，当内存中的byte读取完后，会再次用底层输入流填充缓冲区数组。
 
 ##  BIO,NIO,AIO,IO多路复用
@@ -730,10 +730,6 @@ join()： join()方法会使当前线程等待调用join()方法的线程结束�
 #### 如果同步块内的线程抛出异常会发生什么？
 
 无论同步块是正常还是异常退出的，里面的线程都会释放锁。
-
-#### 如何在Java中创建线程安全的Singleton？
-
-利用JVM的类加载和静态变量初始化特征来创建Singleton实例，或者是利用枚举类型来创建Singleton。
 
 ## 阻塞队列
 
