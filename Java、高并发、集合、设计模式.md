@@ -772,7 +772,9 @@ ThreadLocalMap 中解决 Hash 冲突的方式并非链表的方式，而是采�
 
 #### 底层数据结构分析
 
-JDK1.8 之前 HashMap 底层是 数组和链表 结合在一起使用也就是 链表散列。HashMap 通过 key 的 hashCode 经过扰动函数处理过后得到 hash 值，然后通过 (n - 1) & hash 判断当前元素存放的位置
+JDK1.8 之前 HashMap 底层是 数组和链表 结合在一起使用也就是 链表散列。
+
+HashMap 通过 key 的 hashCode 经过用高16位异或低16位处理过后得到 hash 值，然后通过 (n - 1) & hash 判断当前元素存放的位置
 
 (n-1)&hash=hash%n，且速度更快；
 
