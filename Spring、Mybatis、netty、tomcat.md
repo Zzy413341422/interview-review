@@ -292,7 +292,7 @@ acceptCount="X" 当同时连接的人数达到maxThreads时,还可以排队,队�
 
 1.Netty的接收和发送数据采用DIRECT BUFFERS，使用堆外直接内存进行Socket读写，不用在字节缓冲区的进行二次拷贝，如果使用传统的堆内存（HEAP BUFFERS）进行 Socket 读写，JVM 会将堆内存 Buffer 拷贝一份到直接内存中，然后才写入 Socket 中。
 
-2.Netty提供了组合Buffer对象，可以聚合多个ByteBuffer对象进行一次操作 
+2.Netty有组合Buffer对象，可以一次性对多个ByteBuffer对象操作 
 
 3.Netty的文件传输采用了transferTo方法，它可以直接将文件缓冲区的数据发送到目标Channel，不用传统通过循环write方式
 

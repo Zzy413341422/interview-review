@@ -43,6 +43,10 @@ Character,    Byte，Short，Long 的缓存池范围默认都是: -128 到 127�
 ```java
 Class stuClass = Class.forName("fanshe.field.Student");
 ```
+java.lang.reflect 类库主要包含了以下三个类：
+Field ：可以使用 get() 和 set() 方法读取和修改 Field 对象关联的字段；
+Method ：可以使用 invoke() 方法调用与 Method 对象关联的方法；
+Constructor ：可以用 Constructor 的 newInstance() 创建新的对象。
 
 ```java
  		//创建一个实例对象，这个对象是被代理的对象
@@ -100,7 +104,11 @@ equal		hashCode		wait		notify		notifyAll		toString		clone		getClass		finalize
 ## 重载和重写的区别
 
 重载： 发生在同一个类中，方法名必须相同，参数必须不同，方法返回值和访问修饰符可以不同，发生在编译时。 　　
-重写： 发生在父子类中，方法名、参数列表必须相同，返回值范围小于等于父类，抛出的异常范围小于等于父类，访问修饰符范围大于等于父类；
+重写： 发生在父子类中，方法名、参数列表必须相同
+
+- 子类方法的访问权限必须大于等于父类方法；
+- 子类方法的返回类型必须是父类方法返回类型或为其子类型。
+- 子类方法抛出的异常类型必须是父类抛出异常类型或为其子类型。
 
 ## Java 面向对象编程三大特性:封装、继承、多态
 
@@ -685,21 +693,15 @@ Semaphore(信号量)-允许多个线程同时访问： synchronized 和 Reentran
 CountDownLatch （倒计时器）： CountDownLatch是一个同步工具类，它允许一个或多个线程一直等待，直到其他线程的将CountDownLatch减到零后再执行。
 CyclicBarrier(循环栅栏)： 让一组线程到达一个屏障时被阻塞，直到最后一个线程到达屏障时，屏障才会开门，所有被屏障拦截的线程才会继续干活。
 
-## 进程，线程含义和区别
+## 线程
 
 ![img](https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1561231556646&di=b3b0b21f15248881f8bccc226886c7da&imgtype=0&src=http%3A%2F%2Faliyunzixunbucket.oss-cn-beijing.aliyuncs.com%2Fjpg%2Fae52919274a26a79bdbb052230ae747b.jpg%3Fx-oss-process%3Dimage%2Fresize%2Cp_100%2Fauto-orient%2C1%2Fquality%2Cq_90%2Fformat%2Cjpg%2Fwatermark%2Cimage_eXVuY2VzaGk%3D%2Ct_100)
 
-进程是对运行时程序的封装，是系统进行资源调度和分配的基本单位，实现了操作系统的并发；
-线程是进程的子任务，是CPU调度和分配的基本单位，实现进程内部的并发；
-一个程序至少有一个进程，一个进程至少有一个线程，线程依赖于进程而存在；
-进程拥有独立的内存单元，而多个线程共享进程的内存。
-
-#### 实现线程的4种方法：
+#### 实现线程的3种方法：
 
 继承Thread类创建线程
 实现Runnable接口创建线程
-实现Callable接口通过FutureTask包装器来创建Thread线程
-使用ExecutorService、Callable、Future实现有返回结果的线程
+实现Callable接口
 
 #### Java中如何停止一个线程？
 
@@ -867,8 +869,6 @@ public class LRUCache {
     }
  }
 ```
-
-
 
 ## ArrayLisy
 
@@ -1097,3 +1097,4 @@ class BinaryObserver extends Observer{
 #### 迭代器模式：
 
 迭代器模式就是分离了集合对象的遍历行为，抽象出一个迭代器类来负责	
+

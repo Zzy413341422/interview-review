@@ -67,10 +67,6 @@ B+tree的查询效率更加稳定；
 
 对于查询中很少涉及的列或者重复值比较多的列，不宜建立索引。
 
-## 说说b树和b+树，画画b+树的结构，b+树最下面存的是数据吗？下面的数据有序吗？
-
-聚簇索引是数据，否则不是，有序
-
 ## 数据库引擎有哪些？InnoDB和MyIsam有啥区别?
 
 MyISAM InnoDB MEMORY MERGE NDB；
@@ -275,16 +271,10 @@ Redis本质上是一个Key-Value类型的内存数据库,因为是纯内存操�
 ## Redis支持哪几种数据类型？ 
 
 String: set,get,decr,incr,mget
-List: lpush,rpush,lpop,rpop,lrange
-hash : hget,hset,hgetall
-Set、Sorted Set、
-
-## zset数据结构
-
-![img](https://img-blog.csdn.net/20160131083150090)
-
-1.ziplist，压缩双向链表
-2.skiplist,跳表实现
+List: lpush,rpush,lpop,rpop,lrange（双向链表）
+hash : hget,hset,hgetall		（HashMap）
+Set												(HashSet)
+Sorted Set					  			 (HashMap和SkipList)
 
 ## Redis有哪几种数据淘汰策略？ 
 
