@@ -65,33 +65,13 @@ Constructor ：可以用 Constructor 的 newInstance() 创建新的对象。
 
 泛型类：在类名后加一个<T>
 
-静态方法不可以访问类上定义的泛型 
-如果静态方法操作的应用数据类型不确定，可以将泛型定义在方法上。
-
 意义和作用有
 类型的参数化，就是可以把类型像方法的参数那样传递。这一点意义非凡。
 泛型使编译器可以在编译期间对类型进行检查以提高类型安全，减少运行时由于对象类型不匹配引发的异常。
 
-```java
-class Demo<T>
-{
-    public void show(T t)
-    {
-        System.out.println("show: "+t);
-    }
-    public <Q> void print(Q q)
-    {
-        System.out.println("print:"+q);
-    }
+T<? extends B>：只能读，而无法插入（不同子树并不兼容）；
 
-    public static <W>void method(W t)
-    {
-        System.out.println("method: "+t);
-    }
-}
-```
-
-
+T<? super B> ：只能插入，而无法读（大转小类型无法在编译时候检查安全）；
 
 ## Object的九个方法
 
@@ -103,7 +83,7 @@ equal		hashCode		wait		notify		notifyAll		toString		clone		getClass		finalize
 
 ## 重载和重写的区别
 
-重载： 发生在同一个类中，方法名必须相同，参数必须不同，方法返回值和访问修饰符可以不同，发生在编译时。 　　
+重载： 发生在同一个类中，方法名必须相同，参数必须不同，方法返回值和访问修饰符可以不同
 重写： 发生在父子类中，方法名、参数列表必须相同
 
 - 子类方法的访问权限必须大于等于父类方法；
@@ -212,13 +192,13 @@ class Bean{
 
 ## 接口和抽象类的区别是什么 
 
-1.所有方法在接口中不能有实现(Java 8 开始接口方法可以有默认实现），抽象类可以有非抽象的方法
+1.所有方法在接口中不能有实现(Java 8 开始接口方法可以有默认实现），抽象类可以有非抽象的方法（不可实现）和非抽象方法（必须实现）
 
 2.接口中的实例变量默认是 final 类型的，而抽象类中则不一定
 
 3.一个类可以实现多个接口，但最多只能实现一个抽象类
 
-4.一个类实现接口的话要实现接口的所有方法，而抽象类不一定
+4.一个类实现接口的话要实现接口的所有方法，而抽象类实现抽象方法
 
 5.抽象方法可以有public、protected和default这些修饰符 ，接口方法默认修饰符是public。你不可以使用其它修饰符。
 
@@ -245,7 +225,7 @@ class Bean{
 
 对象的相等，比的是内存中存放的内容是否相等。而引用相等，比较的是他们指向的内存地址是否相等。
 
-## == 与 equals(重要)
+## == 与 equals
 
 **==** : 它的作用是判断两个对象的地址是不是相等。即，判断两个对象是不是同一个对象。(基本数据类型==比较的是值，引用数据类型==比较的是内存地址)
 
@@ -315,27 +295,10 @@ Java异常类层次结构图
 ![Javaå¼å¸¸ç±»å±æ¬¡ç»æå¾](https://camo.githubusercontent.com/27aa104d93ba0738be0f3d2e7d5b096c1619d12d/68747470733a2f2f6d792d626c6f672d746f2d7573652e6f73732d636e2d6265696a696e672e616c6979756e63732e636f6d2f323031392d322f457863657074696f6e2e706e67)
 
 在以下4种特殊情况下，finally块不会被执行：
-
 1.在finally语句块中发生了异常。
 2.在前面的代码中用了System.exit()退出程序。
 3.程序所在的线程死亡。
 4.关闭CPU。
-
-## 获取用键盘输入常用的的两种方法
-
-方法1：通过 Scanner
-
-```java
-Scanner input = new Scanner(System.in);
-String s  = input.nextLine();
-```
-
-方法2：通过 BufferedReader
-
-```Java
-BufferedReader input = new BufferedReader(new InputStreamReader(System.in)); 
-String s = input.readLine();
-```
 
 ## Io
 
@@ -387,35 +350,20 @@ AIO这边就程序一调用read就离开返回，然后写好回调函数，或�
 非阻塞就是上述第一个过程你没有阻塞，但是用户线程必须不断的询问os，类似于CAS，cpu疯狂占用，数据是否从磁盘拷贝到内和空间了，如果拷贝好了，则在数据复制的过程阻塞。所以所有的同步过程，在第二阶段都是阻塞的，尽管这是非阻塞的调用。
 多路复用：和非阻塞一样，在第二阶段也是阻塞的，但是第一阶段不再由自己去询问操作系统，而是统一交给一个内核线程去处理，现在才有epoll模型，这个比较快，但是没有事件准备好的情况下还是会阻塞，当你的数据读取完成，这个线程就发送一个信号给原先发起系统调用的用户线程，并开始数据拷贝了。
 异步：上述两个过程都是非阻塞的。
-![nio-vs-io-3.png](http://tutorials.jenkov.com/images/java-nio/nio-vs-io-3.png)
 
-![nio-vs-io-4.png](http://tutorials.jenkov.com/images/java-nio/nio-vs-io-4.png)
+## blockingio和io多路复用的区别
 
-## IO模型对应的问题
+如果BIO要能够同时处理多个客户端请求，即为每一个客户端连接请求都创建一个线程来单独处理。
 
-### （1）blocking和non-blocking的区别
+只需要开启一个线程就可以处理来自多个客户端的连接请求和io请求。 
 
-　　调用blocking IO会一直block住对应的进程直到操作完成，而non-blocking IO在kernel还准备数据的情况下会立刻返回。
+## JAVA的BIO和NIO区别
 
-### （2）synchronous IO和asynchronous IO的区别
+JAVA NIO 包含下面几个核心的组件：
 
-　　在说明synchronous IO和asynchronous IO的区别之前，需要先给出两者的定义。POSIX的定义是这样子的：
-　　　　- A synchronous I/O operation causes the requesting process to be blocked until that I/O operation completes;
-　　　　- An asynchronous I/O operation does not cause the requesting process to be blocked;
-
-　　两者的区别就在于synchronous IO做”IO operation”的时候会将process阻塞。按照这个定义，之前所述的blocking IO，non-blocking IO，IO multiplexing都属于synchronous IO。
-
-　　有人会说，non-blocking IO并没有被block啊。这里有个非常“狡猾”的地方，定义中所指的”IO operation”是指真实的IO操作，就是例子中的recvfrom这个system call。non-blocking IO在执行recvfrom这个system call的时候，**如果kernel的数据没有准备好，这时候不会block进程**。但是，当**kernel中数据准备好的时候，recvfrom会将数据从kernel拷贝到用户内存中，这个时候进程是被block了**，在这段时间内，进程是被block的。
-
-　　而asynchronous IO则不一样，当进程发起IO 操作之后，就直接返回再也不理睬了，直到kernel发送一个信号，告诉进程说IO完成。在这整个过程中，进程完全没有被block。
-
-### （**3**）non-blocking IO和asynchronous IO的区别
-
-　　可以发现non-blocking IO和asynchronous IO的区别还是很明显的。
-
-　　--在non-blocking IO中，虽然进程大部分时间都不会被block，但是它**仍然要求进程去主动的check**，并且当数据准备完成以后，也需要**进程主动的再次调用recvfrom来将数据拷贝到用户内存**。
-
-　　--而asynchronous IO则完全不同。它就像是用户进程将整个IO操作交给了他人（kernel）完成，然后他人做完后发信号通知。在此期间，**用户进程不需要去检查IO操作的状态，也不需要主动的去拷贝数据。** 
+- Channel(通道)：通道是双向的，可读也可写
+- Buffer(缓冲区)：即ByteBuffer，在读取数据时，它是直接读到缓冲区中的; 在写入数据时，写入到缓冲区中。
+- Selector(选择器)：选择器用于使用单个线程处理多个通道。
 
 ## 什么是RESTful架构：
 
@@ -493,8 +441,8 @@ CAS适用于写比较少的情况下（多读场景，冲突一般较少），sy
 
 #### 谈谈 synchronized和ReenTrantLock 的区别
 
-1.两者都是可重入锁，都保证了可见性和互斥性
-2.synchronized 依赖于 JVM 而 ReenTrantLock 依赖于 API
+1.两者都是可重入锁
+2.synchronized 依赖于 JVM ，而 ReenTrantLock 依赖于 API
 3.ReenTrantLock一.等待可中断；二.可实现公平锁；
 4.synchroniezd执行完自动释放锁，ReenTrantLock需要unlock
 5.synchroniezd可以修饰类和用在代码块
@@ -814,6 +762,8 @@ hi就是扩容后下标为 原位置+原数组容量 的元素链表，从而不
 
 ## HashMap 的长度为什么是2的幂次方
 
+length-1 二进制中为1的位数越多，那么分布就平均
+
 hash%length==hash&(length-1)的前提是 length 是2的 n 次方
 
 ## HashSet 和 HashMap 区别
@@ -896,11 +846,13 @@ LinkedList 底层使用的是双向链表数据结构（JDK1.6之前为循环链
 
 2. 底层数据结构： Arraylist 底层使用的是Object数组；LinkedList 底层使用的是双向链表数据结构（JDK1.6之前为循环链表，JDK1.7取消了循环。注意双向链表和双向循环链表的区别：）； 详细可阅读JDK1.7-LinkedList循环链表优化
 
-3. 插入和删除是否受元素位置的影响： ① ArrayList 采用数组存储，所以插入和删除元素的时间复杂度受元素位置的影响。 比如：执行add(E e) 方法的时候， ArrayList 会默认在将指定的元素追加到此列表的末尾，这种情况时间复杂度就是O(1)。但是如果要在指定位置 i 插入和删除元素的话（add(int index, E element) ）时间复杂度就为 O(n-i)。因为在进行上述操作的时候集合中第 i 和第 i 个元素之后的(n-i)个元素都要执行向后位/向前移一位的操作。 ② LinkedList 采用链表存储，所以插入，删除元素时间复杂度不受元素位置的影响，都是近似 O（1）而数组为近似 O（n）。
+3. 理论上：往表中加入大量数据LinkedList更优，删增删指定位置LinkedList更优，查指定位置ArrayList，往表中加入大量数据LinkedList更优
+
+   实际上：增删查指定位置ArrayList遥遥领先，往表中加入大量数据ArrayList稍优
 
 4. 是否支持快速随机访问： LinkedList 不支持高效的随机元素访问，而 ArrayList 支持。快速随机访问就是通过元素的序号快速获取元素对象(对应于get(int index) 方法)。
 
-5. 内存空间占用： ArrayList的空 间浪费主要体现在在list列表的结尾会预留一定的容量空间，而LinkedList的空间花费则体现在它的每一个元素都需要消耗比ArrayList更多的空间（因为要存放直接后继和直接前驱以及数据）。
+5. 内存空间占用： ArrayList的空间浪费主要体现在在list列表的结尾会预留一定的容量空间，而LinkedList的空间花费则体现在它的每一个元素都需要消耗比ArrayList更多的空间（因为要存放直接后继和直接前驱以及数据）。
 
    ####  list 的遍历方式选择：
 
@@ -959,7 +911,7 @@ public enum Singleton {
 ```
 #### 工厂模式：
 
-工厂模式：**封装隐藏创建过程，降低耦合**
+简单工厂模式：**封装隐藏创建过程，降低耦合**
 
 抽象工厂模式：**将工厂的创建能力拓展到产品族**
 
