@@ -489,11 +489,39 @@ CAS适用于写比较少的情况下（多读场景，冲突一般较少），sy
 
 ## Volatile:
 
-#### 讲一下Java内存模型
+#### JMM
 
-在 JDK1.2 之前，Java的内存模型实现总是从主存（即共享内存）读取变量，是不需要进行特别的注意的。而在当前的 Java 内存模型下，线程可以把变量保存本地内存（比如机器的寄存器）中，而不是直接在主存中进行读写。这就可能造成一个线程在主存中修改了一个变量的值，而另外一个线程还继续使用它在寄存器中的变量值的拷贝，造成数据的不一致。
+![img](https://img-blog.csdn.net/20170513140412095?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvTFpONTE=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/Center)
 
-![æ°æ®ä¸ä¸è´](https://camo.githubusercontent.com/2df61e9867d603bd3216c12851b2f7bcaec8847b/68747470733a2f2f6d792d626c6f672d746f2d7573652e6f73732d636e2d6265696a696e672e616c6979756e63732e636f6d2f323031392d362f2545362539352542302545362538442541452545342542382538442545342542382538302545382538372542342e706e67)
+在线程执行时，首先会从主存中read变量值，再load到工作内存中的副本中，然后再传给处理器执行，执行完毕后再给工作内存中的副本赋值，随后工作内存再把值传回给主存，主存中的值才更新。
+
+#### 可见性
+
+```
+线程1： load i from 主存    // i = 0
+        i + 1  // i = 1
+线程2： load i from主存  // 因为线程1还没将i的值写回主存，所以i还是0
+        i +  1 //i = 1
+线程1:  save i to 主存
+线程2： save i to 主存
+```
+
+#### 指令重排序
+
+```
+int a = 0;
+bool flag = false;
+public void write() {
+    a = 2;              //1
+    flag = true;        //2
+}
+public void multiply() {
+    while (flag) {         //3
+        int ret = a * a;//4
+        flag=false;
+    }
+}
+```
 
 要解决这个问题，就需要把变量声明为 volatile，这就指示 JVM，这个变量是不稳定的，每次使用它都到主存中进行读取。
 说白了， volatile 关键字的主要作用就是保证变量的可见性然后还有一个作用是防止指令重排序。

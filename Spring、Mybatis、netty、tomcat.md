@@ -188,6 +188,16 @@ Spring 配备构建Web 应用的全功能MVC框架。Spring可以很便捷地和
 #### Spring和SpringMVC的关系
 那么SpringMVC子容器用来注册web组件的Bean，如控制器、处理器映射、视图解析器等。而Spring用来注册其他Bean，这些Bean通常是驱动应用后端的中间层和数据层组件。
 
+#### 为什么要使用springmvc
+
+要使用Servlet完成的复杂的功能时，需要编写多个Servlet类，并且在web.xml进行注册
+
+Spring web MVC框架提供了MVC架构和用于开发灵活Web应用程序
+
+比起Servlet，更好更简单地接受参数；
+
+更简单地处理返回对象数据；
+
 # Mybatis
 
 #### Mybatis缓存：
