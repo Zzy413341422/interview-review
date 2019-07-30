@@ -72,7 +72,7 @@ GC Roots：
 
 ## 判断对象死亡后，如何避免GC
 
-**gc进行两次标记**，即第一次标记不在“关系网”中的对象。**第二次的话就要先判断该对象有没有实现finalize()方法了**，如果没有实现就直接判断该对象可回收；如果实现了就会先放在一个队列中
+![img](https://img-blog.csdnimg.cn/20190224114129141.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L1lzdW5mbG93ZXI=,size_16,color_FFFFFF,t_70)
 
 ## Stop-The-World原因
 
