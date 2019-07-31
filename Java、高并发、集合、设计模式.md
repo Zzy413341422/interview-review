@@ -684,6 +684,9 @@ CyclicBarrier(循环栅栏)： 让一组线程到达一个屏障时被阻塞，�
 异常法
 
 thread. Interrupt()
+
+调用interrupt可以抛出InterruptedException异常（只在wait状态时），不然只是将线程标记为可终止状态。
+
 if(this.interrupted())  throw new InterruptedException();
 
 #### 说说wait,yield,sleep,join?
