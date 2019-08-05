@@ -306,6 +306,10 @@ acceptCount="X" 当同时连接的人数达到maxThreads时,还可以排队,队�
 
 3.Netty的文件传输采用了transferTo方法，它可以直接将文件缓冲区的数据发送到目标Channel，不用传统通过循环write方式
 
+![img](https://ss2.bdstatic.com/70cFvnSh_Q1YnxGkpoWK1HF6hhy/it/u=3368301146,3506362174&fm=26&gp=0.jpg)
+
+![img](https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=3153115758,3045316412&fm=26&gp=0.jpg)
+
 #### 内存池：
 
 频繁的申请和释放内存对GC不友好，因此Netty开发了一个内存池模块用于内存的分配和回收来降低GC压力，也就是直接内存。
