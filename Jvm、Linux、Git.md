@@ -182,11 +182,11 @@ Full GC：
 
 ## 双亲委派模型
 
-AppClassLoader应用类加载器,又称为系统类加载器,负责在JVM启动时,加载来自在命令java中的classpath的jar包
+BootstrapClassLoader：Java类加载层次中最顶层的类加载器，负责加载JDK中的核心类库
 
 ExtClassLoader称为扩展类加载器，主要负责加载Java的扩展类库,默认加载JAVA_HOME/jre/lib/ext/目录下的所有jar包
 
-BootstrapClassLoader：Java类加载层次中最顶层的类加载器，负责加载JDK中的核心类库
+AppClassLoader应用类加载器,又称为系统类加载器,负责在JVM启动时,加载来自在命令java中的classpath的jar包
 
 ## 如何破坏双亲委派模型
 

@@ -1,10 +1,8 @@
 # Mysql
 
-##  在使用left jion时，on和where条件的区别如下：
+##  ON、WHERE、HAVING的区别
 
-1、 on条件是在生成临时表时使用的条件，它不管on中的条件是否为真，都会返回左边表中的记录。
-
-2、where条件是在临时表生成好后，再对临时表进行过滤的条件。这时已经没有left join的含义（必须返回左边表的记录）了，条件不为真的就全部过滤掉。
+ON、WHERE、HAVING的主要差别是其子句中限制条件起作用时机引起的，ON是在生产临时表之前根据条件筛选记录，WHERE是从生产的临时表中筛选数据，而HAVING是对临时表中满足条件的数据，进行计算分组之后，通过HAVING限制语句筛选分组，返回结果是满足HAVING子句限制的分组。
 
 ## 为什么要创建索引
 
@@ -113,7 +111,7 @@ redo日志记录数据修改后的值
 
 - 共享锁（S）：`SELECT * FROM table_name WHERE ... LOCK IN SHARE MODE`。
 
-- 排他锁（X)：`SELECT * FROM table_name WHERE ... FOR UPDATE`。
+- 排他锁（X）：`SELECT * FROM table_name WHERE ... FOR UPDATE`。
 
 - 间隙锁  :SELECT c FROM t WHERE c BETWEEN 10 and 20 FOR UPDATE;
 
@@ -319,6 +317,8 @@ Reids在内存存储引擎领域的一大优点是提供 list 和 set 操作，�
 ## 哈希槽
 
 一共有16384个槽，每台服务器分管其中的一部分，插入一个数据的时候，将key的哈希结果对16384取余，确定将数据放到哪个槽里面
+
+当需要增加节点时，只需要把其他节点的某些哈希槽挪到新节点就可以了；
 
 ## 怎么测试Redis的连通性？
 

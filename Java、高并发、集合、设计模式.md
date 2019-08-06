@@ -882,7 +882,7 @@ LinkedList 底层使用的是双向链表数据结构（JDK1.6之前为循环链
 
 1. 是否保证线程安全： ArrayList 和 LinkedList 都是不同步的，也就是不保证线程安全；
 
-2. 底层数据结构： Arraylist 底层使用的是Object数组；LinkedList 底层使用的是双向链表数据结构（JDK1.6之前为循环链表，JDK1.7取消了循环。注意双向链表和双向循环链表的区别：）； 详细可阅读JDK1.7-LinkedList循环链表优化
+2. 底层数据结构： Arraylist 是Object数组；LinkedList 是双向链表;
 
 3. 理论上：往表中加入大量数据LinkedList更优，删增删指定位置LinkedList更优，查指定位置ArrayList，往表中加入大量数据LinkedList更优
 
