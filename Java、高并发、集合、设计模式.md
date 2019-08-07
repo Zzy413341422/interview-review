@@ -306,7 +306,7 @@ Java异常类层次结构图
 ```java
 		File file=new File("abc.txt");
         InputStream fileInputStream = new FileInputStream(file);
-        BufferedInputStream bufferedInputStream = new BufferedInputStream(fileInputStream);
+        BufferedInputStream bufferedInputStream=new BufferedInputStream(fileInputStream);
         String content=null;
         byte[] buffer=new byte[10240];
         int flag=0;
@@ -970,7 +970,7 @@ public enum Singleton {
 
 外观模式：**原本兼容的类组合在一起更加简单地工作**
 
-代理模式：**为其他对象提供一种代理以控制对这个对象的访问**
+代理模式：**为其他对象提供一种代理对象以控制对这个对象的访问**
 
 组合模式：**用于描述“整体-部分”的概念**
 
