@@ -821,31 +821,25 @@ hash%length==hash&(length-1)的前提是 length 是2的 n 次方
 
 HashSet底层是Hashmap；把放入的对象作为key放入hashmap中。所以没有重复的对象。
 
-## ConcurrentHashMap 和 Hashtable 的区别
+## ConcurrentHashMap 和 Hashtable和SychronizedMap
 
 JDK1.7
 首先将数据分为一段一段的存储，然后给每一段数据配一把锁，当一个线程占用锁访问其中一个段数据时，其他段的数据也能被其他线程访问。
 
-ConcurrentHashMap 是由 Segment 数组结构和 HashEntry 数组结构组成。
-
-Segment 实现了 ReentrantLock,所以 Segment 是一种可重入锁，扮演锁的角色。HashEntry 用于存储键值对数据。
-
-JDK1.8 （上面有示意图）
+JDK1.8
 ConcurrentHashMap取消了Segment分段锁，采用CAS和synchronized来保证并发安全。数据结构跟HashMap1.8的结构类似，数组+链表/红黑二叉树。
 
-synchronized只锁定当前链表或红黑二叉树的首节点，这样只要hash不冲突，就不会产生并发，效率又提升N倍。
+#### ConcurrentHashMap 
 
-HashTable: 
+弱一致性，synchronized只锁定当前链表或红黑二叉树的首节点，其他的就和hashmap和hashtable的区别一样
 
-![img](https://camo.githubusercontent.com/60920968c0e19878ca2a3a153cbe4872f950b571/68747470733a2f2f6d792d626c6f672d746f2d7573652e6f73732d636e2d6265696a696e672e616c6979756e63732e636f6d2f323031392d362f486173685461626c652545352538352541382545382541312541382545392539342538312e706e67)
+#### Hashtable
 
-JDK1.7的ConcurrentHashMap： 
+方法上加锁
 
-![JDK1.7çConcurrentHashMap](https://camo.githubusercontent.com/092aae16c3a38854b4cea8b7e42dc6720df4441f/68747470733a2f2f6d792d626c6f672d746f2d7573652e6f73732d636e2d6265696a696e672e616c6979756e63732e636f6d2f323031392d362f436f6e63757272656e74486173684d61702545352538382538362545362541452542352545392539342538312e6a7067)
+#### SychronizedMap
 
-JDK1.8的ConcurrentHashMap： 
-
-![JDK1.8çConcurrentHashMap](https://camo.githubusercontent.com/b823c5f2cf18e7e27da70409d2b5e18fed820364/68747470733a2f2f6d792d626c6f672d746f2d7573652e6f73732d636e2d6265696a696e672e616c6979756e63732e636f6d2f323031392d362f4a444b312e382d436f6e63757272656e74486173684d61702d5374727563747572652e6a7067)
+对象锁，方法都要获取一个变量mutex的锁
 
 ## LinkedHashmap实现Lru
 
