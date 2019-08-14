@@ -350,7 +350,7 @@ AIO：AIO这边就程序一调用read就离开返回，然后写好回调函数�
 
 #### select
 
-创建一个fd_set数组，放入内核空间中，内核遍历监听多个描述符，遍历将fd_set返回给对应用户
+创建一个fd_set数组，放入内核空间中，内核监听多个描述符，遍历将fd_set返回给对应用户
 
 存在的问题： 
 1. 内置数组的形式使得select的接受的最多请求数受限于FD_SIZE； 
@@ -894,7 +894,7 @@ LinkedList 底层使用的是双向链表数据结构（JDK1.6之前为循环链
 
 2. 底层数据结构： Arraylist 是Object数组；LinkedList 是双向链表;
 
-3. 理论上：往表中加入大量数据LinkedList更优，删增删指定位置LinkedList更优，查指定位置ArrayList，往表中加入大量数据LinkedList更优
+3. 理论上：往表中加入大量数据LinkedList更优，删增删指定位置LinkedList更优，查指定位置ArrayList
 
    实际上：增删查指定位置ArrayList遥遥领先，往表中加入大量数据ArrayList稍优
 
