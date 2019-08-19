@@ -123,9 +123,34 @@ AOP核心就是切面，它将多个类的通用行为封装成可重用的模�
 
 主要区别：cglib会对代码侵入，jdk不会对代码侵入，便于维护代码
 
-## AOP的应用
+## 自定义注解
 
-事务，日志，权限
+```java
+@Target(ElementType.METHOD)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface AnalysisActuator {
+}
+```
+```java
+@Aspect
+@Component
+public class AnalysisActuatorAspect {
+    @Pointcut("@annotation(analysisActuator)")
+    public void serviceStatistics(AnalysisActuator analysisActuator) {
+    }
+
+    @Before("serviceStatistics(analysisActuator)")
+    public void doBefore(JoinPoint joinPoint, AnalysisActuator analysisActuator) {
+	......
+    }
+    
+    @After("serviceStatistics(analysisActuator)")
+    public void doAfter(AnalysisActuator analysisActuator) {
+    ......
+    }
+
+}
+```
 
 ## Spring事务管理
 
@@ -324,3 +349,7 @@ Reactor多线程模型；有一组NIO线程处理I/O操作
 
 
 
+
+```
+
+```
