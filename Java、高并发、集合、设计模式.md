@@ -350,10 +350,10 @@ AIO：AIO这边就程序一调用read就离开返回，然后写好回调函数�
 
 #### select
 
-创建一个fd_set数组，放入内核空间中，内核监听多个描述符，遍历将fd_set返回给对应用户
+创建一个fd_set数组，放入内核空间中，内核监听多个描述符，将fd_set返回给对应用户，用户遍历fd_set
 
 存在的问题： 
-1. 内置数组的形式使得select的接受的最多请求数受限于FD_SIZE； 
+1. 内置数组的形式使得select的接受的最多请求数受限于FD_SetSIZE； 
 2. 每次调用select前都要重新初始化fd_set，将fd_set从用户空间拷贝到内核态，每次调用select后，都需要将fd从内核态拷贝到用户态； 
 3. 轮寻排查当文件描述符个数很多时，效率很低； 
 
@@ -677,7 +677,7 @@ CAS机制当中使用了3个基本操作数：内存地址V，旧的预期值A�
 Exclusive（独占）：只有一个线程能执行，如ReentrantLock。又可分为公平锁和非公平锁：
 公平锁：按照线程在队列中的排队顺序，先到者先拿到锁
 非公平锁：当线程要获取锁时，无视队列顺序直接去抢锁，谁抢到就是谁的
-Share（共享）：多个线程可同时执行，如Semaphore/CountDownLatch。Semaphore、CountDownLatCh、 CyclicBarrier、ReadWriteLock 我们都会在后面讲到。
+Share（共享）：多个线程可同时执行，如Semaphore/CountDownLatch、Semaphore、CountDownLatCh、 CyclicBarrier、ReadWriteLock 我们都会在后面讲到。
 
 #### AQS 组件总结
 

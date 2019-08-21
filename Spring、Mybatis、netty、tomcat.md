@@ -8,6 +8,8 @@ Spring是一个轻量级的控制反转(IoC)和面向切面(AOP)的容器框架�
 
 面向切面——将业务代码分离成切面，然后再插入到代码中进行内聚性开发。
 
+[高内聚](https://www.baidu.com/s?wd=高内聚&tn=SE_PcZhidaonwhc_ngpagmjz&rsv_dl=gh_pc_zhidao)，是指让一个类或者一个方法让他专注去做一件事情。低耦合：这个又要求对象，类之间减少[耦合性](https://www.baidu.com/s?wd=耦合性&tn=SE_PcZhidaonwhc_ngpagmjz&rsv_dl=gh_pc_zhidao)，
+
 #### BeanFactory：
 
 BeanFactory是接口，给具体的IOC容器的实现提供了规范，它是负责创建和管理bean的一个工厂。
