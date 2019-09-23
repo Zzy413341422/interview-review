@@ -168,7 +168,7 @@ SELECT id,title,content **FROM** items **WHERE** id IN (**SELECT** id **FROM** i
 
 ```sql
 本月：
-SELECT * FROM 表名 WHERE DATE_FORMAT( 时间字段名, ‘%Y%m’ ) = DATE_FORMAT( CURDATE( ) , ‘%Y%m’ )
+SELECT * FROM 表名 WHERE DATE_FORMAT( 时间字段名, "%Y%m" ) = DATE_FORMAT( NOW( ) , "%Y%m" )
 昨天：
 SELECT * FROM 表名 WHERE TO_DAYS( NOW( ) ) - TO_DAYS( 时间字段名) <= 1
 ```
