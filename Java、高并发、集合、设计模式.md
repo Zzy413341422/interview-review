@@ -27,6 +27,10 @@
 2.JDK 和 JRE 中都包含 JVM ；
 3.JVM 是 java 编程语言的核心并且具有平台独立性。
 
+## JIT
+
+首先通过Java编译器把Java源代码编译成平台无关的二进制字节码。然后在Java程序真正执行之前，系统通过JIT编译器把Java的字节码编译为本地化机器码。
+
 ## Java和C++的区别
 
 •	都是面向对象的语言，都支持封装、继承和多态
@@ -140,7 +144,7 @@ ii.表达式右边如果存在字符串引用，也就是字符串对象的句�
 
 ## 值传递和引用传递
 
-值传递和引用传递，属于方法调用时参数的求值策略。
+值传递是指将值的副本传递给调用的函数，调用的函数可以改变副本的值，但是并不会影响main函数中的原值。 引用传值，传递的是对象的引用，同一个引用指向相同的实体，所以改变引用指向实体的值，可以影响main函数中实体的值。
 
 ## 枚举
 
@@ -417,12 +421,42 @@ Collections.sort(stus,new Comparator<Student>() {
 
 ## Synchronized:
 
-#### JVM实现底层：
+#### JVM实现底层
 
 同步代码块：同步语句块的实现使用的是monitorenter 和 monitorexit 指令
 方法：方法表示ACC_SYNCHRONIZED；
 
-![img](https://user-gold-cdn.xitu.io/2018/7/27/164daccb3b88464e?imageView2/0/w/1280/h/960/format/webp/ignore-error/1)
+synchronized用的锁是存在Java对象头里的。
+
+JVM基于进入和退出Monitor对象来实现方法同步和代码块同步。代码块同步是使用monitorenter和monitorexit指令实现的，monitorenter指令是在编译后插入到同步代码块的开始位置，而monitorexit是插入到方法结束处和异常处。任何对象都有一个monitor与之关联，当且一个monitor被持有后，它将处于锁定状态。
+
+根据虚拟机规范的要求，在执行monitorenter指令时，首先要去尝试获取对象的锁，如果这个对象没被锁定，或者当前线程已经拥有了那个对象的锁，把锁的计数器加1；相应地，在执行monitorexit指令时会将锁计数器减1，当计数器被减到0时，锁就释放了。如果获取对象锁失败了，那当前线程就要阻塞等待，直到对象锁被另一个线程释放为止。
+
+注意两点：
+
+1、synchronized同步快对同一条线程来说是可重入的，不会出现自己把自己锁死的问题；
+
+2、同步块在已进入的线程执行完之前，会阻塞后面其他线程的进入。
+
+#### **Mutex Lock**
+
+监视器锁（Monitor）本质是依赖于底层的操作系统的Mutex Lock（互斥锁）来实现的。每个对象都对应于一个可称为" 互斥锁" 的标记，这个标记用来保证在任一时刻，只能有一个线程访问该对象。
+
+互斥锁：用于保护临界区，确保同一时间只有一个线程访问数据。对共享资源的访问，先对互斥量进行加锁，如果互斥量已经上锁，调用线程会阻塞，直到互斥量被解锁。在完成了对共享资源的访问后，要对互斥量进行解锁。
+
+**mutex的工作方式：**
+
+![img](https://pic4.zhimg.com/80/v2-ba0c5a802bc7c45d3add8214ad6f1eaf_hd.jpg)
+
+- 1) 申请mutex
+- 2) 如果成功，则持有该mutex
+- 3) 如果失败，则进行spin自旋. spin的过程就是在线等待mutex, 不断发起mutex gets, 直到获得mutex或者达到spin_count限制为止
+- 4) 依据工作模式的不同选择yiled还是sleep
+- 5) 若达到sleep限制或者被主动唤醒或者完成yield, 则重复1)~4)步，直到获得为止
+
+由于Java的线程是映射到操作系统的原生线程之上的，如果要阻塞或唤醒一条线程，都需要操作系统来帮忙完成，这就需要从用户态转换到核心态中，因此状态转换需要耗费很多的处理器时间。所以synchronized是Java语言中的一个重量级操作。在JDK1.6中，虚拟机进行了一些优化，譬如在通知操作系统阻塞线程之前加入一段自旋等待过程，避免频繁地切入到核心态中：
+
+synchronized与java.util.concurrent包中的ReentrantLock相比，由于JDK1.6中加入了针对锁的优化措施（见后面），使得synchronized与ReentrantLock的性能基本持平。ReentrantLock只是提供了synchronized更丰富的功能，而不一定有更优的性能，所以在synchronized能实现需求的情况下，优先考虑使用synchronized来进行同步。
 
 #### synchronized关键字最主要的三种使用方式：
 

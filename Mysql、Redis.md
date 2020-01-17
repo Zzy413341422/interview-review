@@ -33,20 +33,17 @@ FULLTEXT，HASH，BTREE，RTREE。
 - 非聚集索引在叶子节点存储的是**主键和索引列**
 - 使用非聚集索引查询出数据时，**拿到叶子上的主键再去查到想要查找的数据**。(拿到主键再查找这个过程叫做**回表**)
 
-## 建立联合索引a,b,c，请问查询条件为a,c是否使用索引？a,b是否使用索引？b,a,c是否使用索引？
+## 索引规则
 
 ![å¾çæè¿°](https://segmentfault.com/img/bVUeaZ?w=778&h=377)
 
-***最左前缀原则：***以**最左边的为起点**任何连续的索引都能匹配上
+遇到范围查询(>、<、between、like、order by)就停止匹配
 
-**联合索引本质：**
+前导模糊查询不会使用索引：like '%李'
 
-当创建**(a,b,c)联合索引**时，相当于创建了**(a)单列索引**，**(a,b)联合索引**以及**(a,b,c)联合索引**
-想要索引生效的话,只能使用 a和a,b和a,b,c三种组合；当然，我们上面测试过，**a,c组合也可以，但实际上只用到了a的索引，c并没有用到！**
+or左右都要有索引
 
-使用or：索引失效。
-
-使用范围<>：取范围作最后一个索引。
+负向条件（!=、<>、not in、not exists、not lik）不会使用索引，建议用in
 
 ## 为什么说B+-tree比B 树更适合实际应用中操作系统的文件索引和数据库索引？
 
@@ -121,6 +118,8 @@ redo日志记录数据修改后的值
 ## 数据库锁粒度大会引发什么问题
 
 ![img](https://user-gold-cdn.xitu.io/2018/7/23/164c6d7ae44d8ac6?imageView2/0/w/1280/h/960/format/webp/ignore-error/1)
+
+![img](https://img-blog.csdn.net/20180213110848081?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvc2lseXZpbg==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
 
 - 对于`UPDATE、DELETE、INSERT`语句，**InnoDB**会**自动**给涉及数据集加排他锁（X)
 
@@ -230,6 +229,15 @@ ALL
 
 第六才是水平切分，针对数据量大的表，这一步最麻烦，最能考验技术水平，要选择一个合理的sharding key,为了有好的查询效率，表结构也要改动，做一定的冗余，应用也要改，sql中尽量带sharding key，将数据定位到限定的表上去查，而不是扫描全部的表；
 
+## 数据库分区和分表的区别
+
+数据库分区：将大表进行分区，不同分区可以放置在不同存储设备上，这些分区在逻辑上组成一个大表，对客户端透明
+
+1. 分区方式和水平切片是类似的，分区方式也和水平切片方式类似，如范围切片，取模切片等
+2. 数据库分区是数据库自身的特性，切片则是外部强制手段控制完成的
+3. 数据库分区无法将分区跨库，更不能跨数据库服务器，但能保存在不同数据文件从而放置在不同存储设备上
+4. 数据库分区是数据库的特性，数据完整性、一致性等实现起来很方便，这一切都是数据库自身保证的
+
 ## 读写分离
 
 主从复制原理：主库将变更写入 binlog 日志，然后从库连接到主库之后，从库有一个 IO 线程，将主库的 binlog 日志拷贝到自己本地，写入一个 relay 中继日志中。接着从库中有一个 SQL 线程会从中继日志读取 binlog，然后执行 binlog 日志中的内容，也就是在自己本地再次执行一遍 SQL，这样就可以保证自己跟主库的数据是一样的。
@@ -292,11 +300,135 @@ Redis本质上是一个Key-Value类型的内存数据库,因为是纯内存操�
 
 ## Redis支持哪几种数据类型？ 
 
-String: set,get,decr,incr,mget
-List: lpush,rpush,lpop,rpop,lrange（双向链表）
-hash : hget,hset,hgetall		（HashMap）
-Set												(HashSet)
-Sorted Set					  			 (HashMap和SkipList)
+#### 3.1 字符串(string)
+
+> 字符串编码有三个：int、raw、embstr。
+
+##### 3.1.1 int
+
+> 当string对象的值全部是数字，就会使用int编码。
+
+```
+127.0.0.1:6379> set number 123455
+OK
+127.0.0.1:6379> object encoding number
+"int"
+```
+
+##### 3.1.2 embstr
+
+> 字符串或浮点数长度小于等于39字节，就会使用embstr编码方式来存储，embstr存储内存一般很小，所以redis一次性分配且内存连续(效率高)。
+
+```
+127.0.0.1:6379> set shortStr "suwe suwe suwe"
+OK
+127.0.0.1:6379> object encoding shortStr
+"embstr"
+```
+
+##### 3.1.2 raw
+
+> 当一个字符串或浮点数长度大于39字节，就使用SDS来保存，编码为raw，由于不确定值的字节大小，所以键和值各分配各的，所以就分配两次内存(回收也是两次)，同理它一定不是内存连续的。
+
+```
+127.0.0.1:6379> set longStr "hello everyone, we dont need to sleep around to go aheard! do you think?"
+OK
+127.0.0.1:6379> object encoding longStr
+"raw"
+```
+
+##### 3.1.3 编码转换
+
+> 前面说过，Redis会自动对编码进行转换来适应和优化数据的存储。
+
+int->raw
+
+> 条件：数字对象进行append字母，就会发生转换。
+
+```
+127.0.0.1:6379> object encoding number
+"int"
+127.0.0.1:6379> append number " is a lucky number"
+(integer) 24
+127.0.0.1:6379> object encoding number
+"raw"
+```
+
+embstr->raw
+
+> 条件：对embstr进行修改，redis会先将其转换成raw，然后才进行修改。所以embstr实际上是只读性质的。
+
+```
+127.0.0.1:6379> object encoding shortStr
+"embstr"
+127.0.0.1:6379> append shortStr "(hhh"
+(integer) 18
+127.0.0.1:6379> object encoding shortStr
+"raw"
+```
+
+#### 3.2 列表(list)
+
+> 列表对象编码可以是：ziplist或linkedlist。
+
+1. `ziplist`压缩列表不知道大家还记得不，就是`zlbytes zltail zllen entry1 entry2 ..end`结构,`entry节点`里有`pre-length、encoding、content`属性，忘记的可以返回去看下。
+2. `linkedlist`,类似双向链表，也是上一章的知识。
+
+##### 3.2.1 编码转换
+
+ziplist->linkedlist
+
+> 条件：列表对象的所有字符串元素的长度大于等于64字节 & 列表元素数大于等于512. 反之，小于64和小于512会使用ziplist而不是用linkedlist。
+
+> 这个阈值是可以修改的，修改选项：`list-max-ziplist-value`和`list-max-ziplist-entriess```
+
+#### 3.3 哈希(hash)
+
+> 哈希对象的编码有:ziplist和hashtable
+
+##### 3.3.1 编码转换
+
+ziplist->hashtable
+
+> 条件：哈希对象所有键和值字符串长度大于等于64字节 & 键值对数量大于等于512
+
+> 这个阈值也是可以修改的，修改选项：`hash-max-ziplist-value`和`hash-max-ziplist-entriess```
+
+#### 3.4. 集合(set)
+
+> 集合对象的编码有：intset和hashtable
+
+##### 3.4.1 intset
+
+1. 集合对象所有元素都是整数
+2. 集合对象元素数不超过512个
+
+##### 3.4.2 编码转换
+
+intset->hashtable
+
+> 条件：元素不都是整数 & 元素数大于等于512
+
+#### 3.5. 有序集合(zset)
+
+> 有序集合用到的编码：ziplist和skiplist
+
+大家可能很好奇阿，ziplist的entry中只有属性content可以存放数据，集合也是`key-value`形式，那怎么存储呢?
+
+> 第一个节点保存key、第二个节点保存value 以此类推...
+
+##### 3.5.1 为什么要用这两个编码
+
+1. 如果只用ziplist来实现，无法做到元素的排序，不支持范围查找，能做到元素的快速查找。
+2. 如果只用skiplist来实现，无法做到快速查找，但能做到元素排序、范围操作。
+
+##### 3.5.2 编码转换
+
+ziplist->skiplist
+
+> 条件：有序集合元素数 >= 128 & 含有元素的长度 >= 64
+
+> 这个阈值也是可以修改的，修改选项：`zset-max-ziplist-value`和`zset-max-ziplist-entriess`
 
 ## Redis有哪几种数据淘汰策略？ 
 
@@ -381,7 +513,13 @@ Redi检查内存使用情况，如果大于maxmemory的限制, 则根据设定�
 ### 缓存穿透
 
 简介：一般是黑客故意去请求缓存中不存在的数据，导致所有的请求都落到数据库上，造成数据库短时间内承受大量请求而崩掉。
-解决办法： 如果一个查询返回的数据为空（不管是数据不存在，还是系统故障），我们仍然把这个空结果进行缓存，但它的过期时间会很短，最长不超过五分钟。
+解决办法： 
+
+如果一个查询返回的数据为空（不管是数据不存在，还是系统故障），我们仍然把这个空结果进行缓存，但它的过期时间会很短，最长不超过五分钟。
+
+双缓存机制：设置一级缓存和二级缓存，一级缓存过期时间短，二级缓存过期时间长或者不过期，一级缓存失效后访问二级缓存，同时刷新一级缓存和二级缓存。
+
+![img](https://mmbiz.qpic.cn/mmbiz_jpg/FjoD2pNz8FGqwzgM9vLFjEnqIFVL3gp3aIdkFtMZVrr0jKsDA6yaK56emShMTAar1zmBsiaiau1xygicvpotK5IEw/640?wx_fmt=jpeg&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
 
 ## 缓存一致性
 

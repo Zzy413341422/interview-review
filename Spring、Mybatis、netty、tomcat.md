@@ -274,6 +274,28 @@ resultMap：如果查询出来的列名和pojo的属性名不一致，通过定�
 
 Spring Boot启动扫描所有jar包的META-INF/spring.factories中配置的 EnableAutoConfiguration组件 ,然后自动配置类根据@ConditionalOnClass找出哪些类需要自动配置，然后@ConditionalOnMissingBean看否有已经生成好的bean，有的化则不需要自动配置类去生产了；
 
+#### 初始化流程
+
+1.通过 `SpringFactoriesLoader` 加载 `META-INF/spring.factories` 文件，获取并创建 `SpringApplicationRunListener` 对象
+
+2.然后由 `SpringApplicationRunListener` 来发出 starting 消息
+
+3.创建参数，并配置当前 SpringBoot 应用将要使用的 Environment
+
+4.完成之后，依然由 `SpringApplicationRunListener` 来发出 environmentPrepared 消息
+
+5.初始化applicationContext后，继续由 `SpringApplicationRunListener` 来发出 contextLoaded 消息，告知 SpringBoot 应用使用的 `ApplicationContext` 已装填OK
+
+6.refresh ApplicationContext，完成IoC容器可用的最后一步
+
+7.由 `SpringApplicationRunListener` 来发出 started 消息
+
+8.完成最终的程序的启动
+
+9.由 `SpringApplicationRunListener` 来发出 running 消息，告知程序已运行起来了
+
+![SpringBoot 应用启动流程图](https://user-gold-cdn.xitu.io/2018/9/5/165a6ae37ed44681?imageView2/0/w/1280/h/960/format/webp/ignore-error/1)
+
 # Tomcat
 
 #### tomcat架构
@@ -349,9 +371,3 @@ Reactor多线程模型；有一组NIO线程处理I/O操作
 
 ![è¿éåå¾çæè¿°](https://img-blog.csdn.net/20180523184528107?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3N1bjc1NDU1MjY=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70)
 
-
-
-
-```
-
-```
