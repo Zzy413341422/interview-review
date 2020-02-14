@@ -25,9 +25,7 @@ Web容器加载Servlet并将其实例化后，Servlet生命周期开始，容器
 
 ## 介绍下Java内存区域
 
-![img](https://camo.githubusercontent.com/a66819fd82c6adfa69b368edf3c52b1fa9cdc89d/68747470733a2f2f6d792d626c6f672d746f2d7573652e6f73732d636e2d6265696a696e672e616c6979756e63732e636f6d2f323031392d332f4a564de8bf90e8a18ce697b6e695b0e68daee58cbae59f9f2e706e67)
-
-![img](https://camo.githubusercontent.com/0bcc6c01a919b175827f0d5540aeec115df6c001/68747470733a2f2f6d792d626c6f672d746f2d7573652e6f73732d636e2d6265696a696e672e616c6979756e63732e636f6d2f323031392d334a617661e8bf90e8a18ce697b6e695b0e68daee58cbae59f9f4a444b312e382e706e67)
+![img](https://mmbiz.qpic.cn/mmbiz_jpg/tO7NEN7wjr7rDf4MJqcl9ibtRLcvkaMHN1fLfJCM1N5uzOUpfCGRHPLn9QQYTpc2rob28rtjOARKgImuMm0YnBg/640?wx_fmt=jpeg&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
 
 - Java堆：占据了虚拟机管理内存中最大的一块，唯一目的就是存放对象实例，也是垃圾回收器主要管理的地方 
 
@@ -185,10 +183,30 @@ Full GC：
 
 ![ç±»å è½½è¿ç¨-11.2kB](http://static.zybuluo.com/Rico123/ojhhtids41ivtuowfj74mkb2/%E7%B1%BB%E5%8A%A0%E8%BD%BD%E8%BF%87%E7%A8%8B)
 
+在使用前加载到JVM
+
+**类型的加载**：查找并加载类的二进制数据（字节码文件），最常见的，是将类的Class文件从磁盘加载到内存中。
+
+**类型的连接**：将类与类的关系确定好，对于字节码相关的处理、验证、校验在加载连接阶段去完成的。字节码本身可以被人为操纵的，也因此可能有恶意的可能性，所以需要校验。
+
+- **验证：**确保被加载类的正确性，就是要按照JVM规范定义的。
+
+- **准备：**为类的静态变量分配内存，并将其初始化为默认值
+
+  如下代码所示，中间过程，在将类型加载到内存过程中，num分配内存，首先设置为0，1是在后续的初始化阶段赋值给num变量
+
+  ```
+  class Test{   public static int num = 1;  }
+  ```
+
+- **解析：**把类中的符号引用转换为直接引用 **符号引用：** 
+
+**类型的初始化**：比如一些静态的变量的赋值是在初始化阶段完成的。
+
 ## 类的实例化与类的初始化
 
 - 类的实例化是指创建一个类的实例(对象)的过程；
-- 类会在首次被“主动使用”时执行初始化，类的初始化是指为类中各个类成员(被static修饰的成员变量)赋初始值的过程，是类生命周期中的一个阶段。准备阶段，JVM为[静态变量](https://www.baidu.com/s?wd=静态变量&tn=44039180_cpr&fenlei=mv6quAkxTZn0IZRqIHckPjm4nH00T1Y4PHRdPj6Ym1TsnAPhrH6d0ZwV5Hcvrjm3rH6sPfKWUMw85HfYnjn4nH6sgvPsT6KdThsqpZwYTjCEQLGCpyw9Uz4Bmy-bIi4WUvYETgN-TLwGUv3EnHbvnjbvnHDdPW0vnj6sPHfvn0)[分配内存](https://www.baidu.com/s?wd=分配内存&tn=44039180_cpr&fenlei=mv6quAkxTZn0IZRqIHckPjm4nH00T1Y4PHRdPj6Ym1TsnAPhrH6d0ZwV5Hcvrjm3rH6sPfKWUMw85HfYnjn4nH6sgvPsT6KdThsqpZwYTjCEQLGCpyw9Uz4Bmy-bIi4WUvYETgN-TLwGUv3EnHbvnjbvnHDdPW0vnj6sPHfvn0)空间
+- 类会在首次被“主动使用”时执行初始化，类的初始化是指**实例变量初始化**、**实例代码块初始化** 以及 **构造函数初始化**，是类生命周期中的一个阶段。准备阶段，JVM为[静态变量](https://www.baidu.com/s?wd=静态变量&tn=44039180_cpr&fenlei=mv6quAkxTZn0IZRqIHckPjm4nH00T1Y4PHRdPj6Ym1TsnAPhrH6d0ZwV5Hcvrjm3rH6sPfKWUMw85HfYnjn4nH6sgvPsT6KdThsqpZwYTjCEQLGCpyw9Uz4Bmy-bIi4WUvYETgN-TLwGUv3EnHbvnjbvnHDdPW0vnj6sPHfvn0)[分配内存](https://www.baidu.com/s?wd=分配内存&tn=44039180_cpr&fenlei=mv6quAkxTZn0IZRqIHckPjm4nH00T1Y4PHRdPj6Ym1TsnAPhrH6d0ZwV5Hcvrjm3rH6sPfKWUMw85HfYnjn4nH6sgvPsT6KdThsqpZwYTjCEQLGCpyw9Uz4Bmy-bIi4WUvYETgN-TLwGUv3EnHbvnjbvnHDdPW0vnj6sPHfvn0)空间
 
 ## 对类加载器有了解吗？什么是双亲委派模型？
 
@@ -243,7 +261,30 @@ Jconsole：可以以图表化的形式显示各种数据
 
 ### 如何查找内存泄漏
 
-将进程堆的情况jmap -dump下来，使用分析工具进行分析，找到发生内存占用过大的对象。
+将进程堆的情况jmap -dump下来，使用分析工具进行分析，找到发生内存占用过大的对象。]
+
+## OOM原因
+#### java.lang.OutOfMemoryError: Java heap space
+
+#### java.lang.OutOfMemoryError: GC overhead limit exceeded
+
+同上
+
+#### java.lang.OutOfMemoryError: unable to create new native thread
+
+不断地建立线程的方式导致内存溢出。
+
+#### java.lang.OutOfMemoryError: Metaspace
+
+运行时产生大量的类
+
+#### java.lang.OutOfMemoryError: Direct buffer memory
+
+本机直接内存溢出
+
+#### 
+
+   
 
 # Linux
 
@@ -333,13 +374,13 @@ top P,M
 
 # Git
 
-## git config
+#### git config
 
 git config --system:系统中对所有用户都普遍适用的配置。
 
 git config --global:用户目录下的配置文件只适用于该用户。
 
-## 用户信息
+#### 用户信息
 
 git config --global user.name "John Doe"
 
@@ -347,21 +388,76 @@ git config --global user.email johndoe@example.com
 
 要检查已有的配置信息，可以使用 `git config --list` 命令。
 
-## git如何拉取指定分支的代码
+#### git如何拉取指定分支的代码
 
 git clone -b develop XXX 
 
-## git 切换远程分支
+#### git 切换远程分支
 
 git checkout -b dev origin/dev
 
-## 取消已经暂存的文件
+## 合并分支：
 
-git reset HEAD <file>
+#### git merge （节点、分支）
 
+合并分支，并在选择分支上生成新节点
+
+```
+git merge dev
+git add .//出现冲突
+git merge --continue
+git merge --abort
+```
+
+#### git rebase （节点、分支）
+
+删除当前分支，并在选择分支上生成选择的点枝的副本
+
+```
+git rebase master
+git add .//出现冲突
+git rebase --continue
+git rebase --abort
+假如rebase子节点，相当于前进。
+```
+
+#### git cherry-pick （节点、分支）
+
+不删除当前分支，并在当前分支上生成选择的点枝的副本
+
+```
+git cherry-pick
+git add .//出现冲突
+git cherry-pick --continue
+git cherry-pick --abort
+```
+## 分支前进和回滚
+
+#### 分支前进（前进到子分支）
+
+```
+git merger 
+```
+
+
+#### 取消已经暂存的文件
+
+```
+git reset --hard HEAD^//回滚版本
+git reset --hard HEAD~2
 git push -f
 
-## 拉取主分支更新的代码
+git revert -n 节点//撤销之前的某一版本，保留该目标版本后面的版本
+git add. git commit
+```
+
+#### 强制移动分支
+
+```
+git branch -f bugFix HEAD^	
+```
+
+#### 拉取主分支更新的代码
 
 git stash
 
@@ -369,33 +465,23 @@ git pull origin master
 
 git stash pop
 
-## 合并分支：
+#### 拉取所有分支
 
-分支提交更多：
+```
+  git branch -r | grep -v '\->' | while read remote; do git branch --track "${remote#origin/}" "$remote"; done
+  git fetch --all
+  git pull --all
+```
 
-![git-br-on-master](https://www.liaoxuefeng.com/files/attachments/919022533080576/0)
+```
+git push --all
+git push///只push当前分支
+```
 
-切换到master；
 
-git merge dev;
 
-## 解决冲突
 
-分别提交后：
-
-![git-br-feature1](https://www.liaoxuefeng.com/files/attachments/919023000423040/0)
-
-切换到master ：git merge feature1;
-
-修改冲突；
-
-提交后：
-
-![git-br-conflict-merged](https://www.liaoxuefeng.com/files/attachments/919023031831104/0)
-
-切换到feature1：git merge master；
-
-## 多人协作
+#### 多人协作
 
 git push失败，因为别人先push过一个新版本。
 
@@ -407,7 +493,7 @@ git branch --set-upstream-to=origin/dev dev
 
 解决后commit，然后push。
 
-## Stash
+#### Stash
 
 git stash list
 

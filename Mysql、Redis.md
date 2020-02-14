@@ -1,5 +1,19 @@
 # Mysql
 
+## Mysql基本架构
+
+![img](https://mmbiz.qpic.cn/mmbiz_jpg/uChmeeX1FpwRDhU2sroFJqmyXeCW1PAQTJC4c5Ffx3lpbq01HWODiaDagxlXXAU33hVjibAj4biaIhwbicaicvX1jvA/640?wx_fmt=jpeg&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
+
+查询缓存：mysql8.0后弃用；命中率低且更新字段后大规模失效
+
+连接器：跟客户端建立链接、获取权限、维持和管理连接。
+
+分析器：语法分析会判断你sql的对错
+
+优化器：优化有一步就是要确认使用哪个索引，比如使用你的主键索引，联合索引还是什么索引更好；对执行顺序进行优化，条件那么多，先查哪个表，还是先关联，会出现很多方案，最后由优化器决定选用哪种方案。
+
+执行器：查表
+
 ##  ON、WHERE、HAVING的区别
 
 ON、WHERE、HAVING的主要差别是其子句中限制条件起作用时机引起的，ON是在生产临时表之前根据条件筛选记录，WHERE是从生产的临时表中筛选数据，而HAVING是对临时表中满足条件的数据，进行计算分组之后，通过HAVING限制语句筛选分组，返回结果是满足HAVING子句限制的分组。
@@ -108,6 +122,15 @@ redo日志记录数据修改后的值
 对主键或唯一索引，如果select查询时where条件全部精确命中(=或者in)，这种场景本身就不会出现幻读，所以只会加行记录锁。
 
 ## 快照读
+
+session A会话会生成一个[94,96,97]的数组。这时候，session A一开始生成的事务数组就派上用场了，session A的事务数组是[94,96,97]，最小事务ID是94，最大事务ID是97，所以，当它遇到一行数据时，会先判断这行数据的版本号X：
+
+- 如果X大于97，那么意味着这行数据，是在session A开始之后，才提交的，应该对session A不可见
+
+- 如果X小于97，那么分两种情况：
+
+- - 如果X在数组里面，比如X是96，那么意味着，当session A开始时，生成这个版本的数据的事务，还没提交，因此这行数据对Session A不可见
+  - 如果X不在数组里面，比如X是95，那么意味着，当session A开始时，生成这个版本的数据的事务，已经提交，因此这行数据对Session A可见
 
 简单的select操作(不包括 select … lock in share mode, select … for update)。
 

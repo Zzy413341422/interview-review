@@ -17,6 +17,10 @@ var arr1 = new([5]int)
 arr :=[5]int{18, 20, 15, 22, 16}
 ```
 
+### range会复制对象，而不是不是直接在原对象上操作。
+
+### 使用range迭代遍历引用类型时，底层的数据不会被复制。
+
 ## 切片
 
 ```
@@ -34,6 +38,7 @@ for ix, value := range slice1(arr) {
 func addStruct(list *[]student)  {
 
 }
+b = append(a[:0:0], a...)//完美地克隆一个切片
 ```
 
 #### 扩容原理：

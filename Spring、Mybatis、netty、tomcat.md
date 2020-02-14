@@ -49,6 +49,7 @@ a依赖于b，将b传入a就是依赖注入。
 a.接口注入
 b.setter方法注入
 c.构造方法注入
+d.注解注入：基于反射原理
 
 #### 哪种依赖注入方式你建议使用，构造器注入，还是 Setter方法注入？
 
@@ -276,23 +277,9 @@ Spring Boot启动扫描所有jar包的META-INF/spring.factories中配置的 Enab
 
 #### 初始化流程
 
-1.通过 `SpringFactoriesLoader` 加载 `META-INF/spring.factories` 文件，获取并创建 `SpringApplicationRunListener` 对象
-
-2.然后由 `SpringApplicationRunListener` 来发出 starting 消息
-
-3.创建参数，并配置当前 SpringBoot 应用将要使用的 Environment
-
-4.完成之后，依然由 `SpringApplicationRunListener` 来发出 environmentPrepared 消息
-
-5.初始化applicationContext后，继续由 `SpringApplicationRunListener` 来发出 contextLoaded 消息，告知 SpringBoot 应用使用的 `ApplicationContext` 已装填OK
-
-6.refresh ApplicationContext，完成IoC容器可用的最后一步
-
-7.由 `SpringApplicationRunListener` 来发出 started 消息
-
-8.完成最终的程序的启动
-
-9.由 `SpringApplicationRunListener` 来发出 running 消息，告知程序已运行起来了
+- 第一部分进行SpringApplication的初始化模块，配置一些基本的环境变量、资源、构造器、监听器；
+- 第二部分实现了应用具体的启动方案，包括启动流程的监听模块、加载配置环境模块、及核心的创建上下文环境模块；
+- 第三部分是自动化配置模块，该模块作为springboot自动配置核心，在后面的分析中会详细讨论。在下面的启动程序中我们会串联起结构中的主要功能。
 
 ![SpringBoot 应用启动流程图](https://user-gold-cdn.xitu.io/2018/9/5/165a6ae37ed44681?imageView2/0/w/1280/h/960/format/webp/ignore-error/1)
 

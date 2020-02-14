@@ -419,6 +419,24 @@ Collections.sort(stus,new Comparator<Student>() {
 
 如果一段代码可以保证被多线程访问后仍能保持正确性，就是线程安全的。
 
+这个问题有值得一提的地方，就是线程安全也是有几个级别的：
+
+**1）不可变**
+
+像String、Integer、Long这些，都是final类型的类，任何一个线程都改变不了它们的值，要改变除非新创建一个，因此这些不可变对象不需要任何同步手段就可以直接在多线程环境下使用
+
+**2）绝对线程安全**
+
+不管运行时环境如何，调用者都不需要额外的同步措施。要做到这一点通常需要付出许多额外的代价，Java中标注自己是线程安全的类，实际上绝大多数都不是线程安全的，不过绝对线程安全的类，Java中也有，比方说CopyOnWriteArrayList、CopyOnWriteArraySet
+
+**3）相对线程安全**
+
+相对线程安全也就是我们通常意义上所说的线程安全，像Vector这种，add、remove方法都是原子操作，不会被打断，但也仅限于此，如果有个线程在遍历某个Vector、有个线程同时在add这个Vector，99%的情况下都会出现ConcurrentModificationException，也就是**fail-fast机制**。
+
+**4）线程非安全**
+
+这个就没什么好说的了，ArrayList、LinkedList、HashMap等都是线程非安全的类，点击[这里](http://mp.weixin.qq.com/s?__biz=MzI3ODcxMzQzMw==&mid=2247486446&idx=2&sn=cb4f3aff0427c5ac3ffe5b61e150f506&chksm=eb538ed8dc2407ceb91fffe3c3bd559d9b15537446f84eb3bfb1a80e67f5efee176ca468a07b&scene=21#wechat_redirect)了解为什么不安全。
+
 ## Synchronized:
 
 #### JVM实现底层
@@ -571,6 +589,8 @@ synchronized关键字和volatile关键字比较
 2.但是volatile关键字只能用于变量而synchronized关键字可以修饰方法以及代码块。
 3.多线程访问volatile关键字不会发生阻塞，而synchronized关键字可能会发生阻塞
 4.volatile不能保证数据的原子性。synchronized关键字能保证。
+
+volatile的一个重要作用就是和CAS结合，保证了原子性
 
 ## 线程池：
 
@@ -819,11 +839,7 @@ threshold = capacity * loadFactor，当Size>=threshold的时候，那么就要�
 
 #### HashMap 扩容原理
 
-lo就是扩容后仍然在原地的元素链表
-
-hi就是扩容后下标为 原位置+原数组容量 的元素链表，从而不需要重新计算hash。
-
-此处只需要判断左边新增的那一位（右数第5位）是否为1即可判断此节点是留在原地还是移动去高位
+resize 就是自动扩容，当 size 达到阈值以后会扩容到原来的 2 倍，关键代码 newCap = oldCap << 1。但是这里有一个非常巧妙的解决方法，因为扩容是扩充的 2 倍，n-1 转换为二进制也就是高位变成了1，那么根据(n - 1) & hash 计算，如果 hash 高位是 1 那么新的 index 位置就是 oldIndex + 16，如果hash 的高位 是 0 ，那么 index 的位置就是原来的 oldIndex 的位置，这样直接判断高位就可以了，省去了重新计算hash。
 
 ## HashMap 和 Hashtable 的区别
 
