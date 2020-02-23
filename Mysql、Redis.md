@@ -2,7 +2,7 @@
 
 ## Mysql基本架构
 
-![img](https://mmbiz.qpic.cn/mmbiz_jpg/uChmeeX1FpwRDhU2sroFJqmyXeCW1PAQTJC4c5Ffx3lpbq01HWODiaDagxlXXAU33hVjibAj4biaIhwbicaicvX1jvA/640?wx_fmt=jpeg&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
+![img](md\27.jpg)
 
 查询缓存：mysql8.0后弃用；命中率低且更新字段后大规模失效
 
@@ -49,7 +49,7 @@ FULLTEXT，HASH，BTREE，RTREE。
 
 ## 索引规则
 
-![å¾çæè¿°](https://segmentfault.com/img/bVUeaZ?w=778&h=377)
+![å¾çæè¿°](md\28.png)
 
 遇到范围查询(>、<、between、like、order by)就停止匹配
 
@@ -61,7 +61,7 @@ or左右都要有索引
 
 ## 为什么说B+-tree比B 树更适合实际应用中操作系统的文件索引和数据库索引？
 
-![img](https://github.com/CyC2018/CS-Notes/raw/master/notes/pics/33576849-9275-47bb-ada7-8ded5f5e7c73.png)
+![img](md\29.png)
 
 B+tree的磁盘读写代价低：B+树的内部节点并没有指向关键字具体信息的指针，因此其内部节点相对B树更小；
 B+tree的查询效率更加稳定；
@@ -101,21 +101,23 @@ redo日志记录数据修改后的值
     
  2. 读提交（Read Commit）
 
-    原理：写加排它锁，读一条语句看到的是一个快照
+    原理：MVCC+快照读：每次select都生成一个快照读。因此会产生不可重复读
 
 3. 可重复读（Reapable Read）
 
-   原理：通过快照读实现：开启事务执行第一个select的时候快照读，生成的快照是通过mvcc和undolog日志来实现的。
+   原理：MVCC+快照读：开启事务执行第一个select的时候快照读，生成的快照是通过mvcc和undolog日志来实现的。
 
 4. 串行化（Serializable）
 
-   原理：Next-Key Lock
+   原理：读写锁或者Next-Key Lock
 
 脏读：一个事务读取了另一个事务未提交的数据；
 不可重复读：不可重复读的重点是修改，同样条件下两次读取结果不同，也就是说，被读取的数据可以被其它事务修改；
 幻读：幻读的重点在于新增或者删除，同样条件下两次读出来的记录数不一样。
 
 ## 当前读的实现方式：next-key锁(行记录锁+Gap间隙锁)
+
+next-key locks由record locks(索引加锁) 和 gap locks
 
 **间隙锁：**只有在Read Repeatable、Serializable隔离级别才有，就是锁定那些范围空间内的数据，假设锁定id>3的数据，id有3,4,5，那么4，5和后面的数字都会被锁定，像6,7…，为什么要这样？因为如果我们不锁定没有的数据，当加入了新的数据id=6，就会出现幻读，间隙锁避免了幻读。
 
@@ -134,30 +136,33 @@ session A会话会生成一个[94,96,97]的数组。这时候，session A一开�
 
 简单的select操作(不包括 select … lock in share mode, select … for update)。
 
-Read Committed隔离级别：每次select都生成一个快照读。
+Read Committed隔离级别：每次select都生成一个快照读。因此会产生不可重复读
 
 Read Repeatable隔离级别：**开启事务后第一个select语句才是快照读的地方，而不是一开启事务就快照读。**
 
-
 ## MVCC(多版本并发控制)
 
-解决了两个事务在提交读、可重复读两个隔离级别下读同一行和写同一行的并发。
+借助MVCC，数据库可以实现RC，RR等隔离级别，用户可以查看当前数据的前一个或者前几个历史版本。保证了ACID中的I-隔离性。
 
-在每一行数据中额外保存两个隐藏的列：create version和delete version
+上述现象在数据库中大家经常看到，但是数据库到底是怎么实现的，深究的人就不多了。  其实原理很简单，数据库就是通过UNDO和MVCC来实现的。
 
-插入数据：记录的版本号即当前事务的版本号
+#### 1、通过DB_ROLL_PT 回溯查找数据历史版本
 
-更新操作：采用的是先标记旧的那行记录为已删除，并且删除版本号是事务版本号，然后插入一行新的记录的方式。
+- 首先InnoDB每一行数据还有一个DB_ROLL_PT的回滚指针，用于指向该行修改前的上一个历史版本  
 
-删除操作：把事务版本号作为删除版本号。
+![img](md\30.jpeg)
 
-查询操作：(1)删除版本号未指定或者大于当前事务版本号(2)创建版本号小于或者等于当前事务版本号
+ 当插入的是一条新数据时，记录上对应的回滚段指针为NULL
+
+![img](md\31.jpeg)
+
+ 更新记录时，原记录将被放入到undo表空间中，并通过DB_ROLL_PT指向该记录。session2查询返回的未修改数据就是从这个undo中返回的。MySQL就是根据记录上的回滚段指针及事务ID判断记录是否可见，如果不可见继续按照DB_ROLL_PT继续回溯查找。
 
 ## 数据库锁粒度大会引发什么问题
 
-![img](https://user-gold-cdn.xitu.io/2018/7/23/164c6d7ae44d8ac6?imageView2/0/w/1280/h/960/format/webp/ignore-error/1)
+![img](md\32.jpg)
 
-![img](https://img-blog.csdn.net/20180213110848081?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvc2lseXZpbg==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
+![img](md\33.png)
 
 - 对于`UPDATE、DELETE、INSERT`语句，**InnoDB**会**自动**给涉及数据集加排他锁（X)
 
@@ -175,6 +180,16 @@ InnoDB实现的`Repeatable read`隔离级别配合GAP间隙锁已经避免了幻
 
 - 乐观锁其实是一种思想，正如其名：认为不会锁定的情况下去更新数据，如果发现不对劲，才不更新(回滚)。在数据库中往往添加一个version字段来实现。
 - 悲观锁用的就是数据库的行锁，认为数据库会发生并发冲突，直接上来就把数据锁住，其他事务不能修改，直至提交了当前事务
+
+## RR级别下 幻读例子
+
+Mysql官方给出的幻读解释是：只要在一个事务中，第二次select多出了row就算幻读。
+1.a事务先select，b事务insert确实会加一个gap锁，但是如果b事务commit，这个gap锁就会释放（释放后a事务可以随意dml操作），
+2.a事务再select出来的结果在MVCC下还和第一次select一样，
+3.接着a事务不加条件地update，这个update会作用在所有行上（包括b事务新加的），
+4.a事务再次select就会出现b事务中的新行，并且这个新行已经被update修改了
+
+原因是前面的UPDATE语句执行之后，会将当前记录上存储的事务信息更新为当前的事务，而当前事务所做的任何更新，对本事务所有SELECT查询都变的可见，因此最后输出的结果是UPDATE执行后更新的所有记录。
 
 ## 外连接
 
@@ -557,7 +572,7 @@ Redi检查内存使用情况，如果大于maxmemory的限制, 则根据设定�
 
 双缓存机制：设置一级缓存和二级缓存，一级缓存过期时间短，二级缓存过期时间长或者不过期，一级缓存失效后访问二级缓存，同时刷新一级缓存和二级缓存。
 
-![img](https://mmbiz.qpic.cn/mmbiz_jpg/FjoD2pNz8FGqwzgM9vLFjEnqIFVL3gp3aIdkFtMZVrr0jKsDA6yaK56emShMTAar1zmBsiaiau1xygicvpotK5IEw/640?wx_fmt=jpeg&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
+![img](md\34.webp)
 
 ## 缓存一致性
 
@@ -584,7 +599,7 @@ A查B更  ABBA （概率低，查的速度比写的速度快很多）
 
 ## 缓存预热
 
-![image-20181023115333275](http://www.forwardlee.com/2018/07/22/Storm%E5%AE%9E%E7%8E%B0%E5%AF%B9Openresty%E4%B8%8A%E6%8A%A5%E7%BB%99Redis%E7%9A%84%E7%83%AD%E7%82%B9%E6%95%B0%E6%8D%AE%E8%BF%9B%E8%A1%8C%E5%AE%9E%E6%97%B6%E5%88%86%E6%9E%90/image-20181023115333275.png)
+![image-20181023115333275](md\35.png)
 
 1、nginx+lua将访问流量上报到kafka中
 2、storm从kafka中消费数据，实时统计出每个商品的访问次数，访问次数基于LRU内存数据结构的存储方案

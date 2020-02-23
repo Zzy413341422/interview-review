@@ -1,6 +1,36 @@
+## 闭包
+
+![img](C:\Users\admin\Desktop\all the web\interview-review\md\77.png)
+
 #### 类型转换
 
-int(1.555)
+## 基础类型
+
+go语言类型转换没有隐式，只有强制转换。(例如int8+int64,int+string都会编译错误)
+
+#### 整形
+有符号整形 int8 int16 int32 int64 默认值 0
+无符号整形 uint8 uint16 uint32 uint64 默认值 0
+特殊整形 int uint byte rune uintptr 默认值 0
+
+#### 浮点型
+浮点型数 float32 float64 默认值 0.0
+复数类型 complex64 complex128 默认值 0+0i
+#### 布尔类型
+true false 默认值 false
+#### 字符串类型
+ string 默认值 ""
+#### 复合类型
+- 数组类型 `[SIZE]TYPE` 默认值根据数组类型变化而变化 如 `[3]int` 为 `[0,0,0]`
+- 结构体类型 `struct` 默认值根据随结构体内部类型变化而变化，如下默认值为`{ 0}` 即 `Name`为`""` `Age`为`0`
+#### **引用类型**
+- 指针 `*TYPE` 默认值 `nil`
+- 切片 `[]TYPE` 默认值 `nil`
+- 字典 `map[TYPE][TYPE]` 默认值 `nil`
+- 通道 `chan` 默认值 `nil`
+- 函数 `func` 默认值 `nil`
+#### 接口类型
+接口 interface 默认值 nil
 
 #### 指针
 
