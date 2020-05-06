@@ -266,13 +266,19 @@ Jconsole：可以以图表化的形式显示各种数据
 
 ### 如何排查cpu100%
 
-1. Java 内存不够或溢出导致GC overhead问题, GC overhead 导致的CPU 100%问题;
-2. 死循环问题. 如常见的HashMap被多个线程并发使用导致的死循环, 或者上面例子中的死循环;
-3. 线程过多。
+**1、**频繁的GC; 如果访问量很高，可能会导致频繁的GC甚至FGC。当调用量很大时，内存分配将如此之快以至于GC线程将连续执行，这将导致CPU飙升。
+
+**3、**序列化和反序列化，md5等; 
+
+**4、**正则表达式。我遇到了正则表达式使CPU充满的情况; 原因可能是Java正则表达式使用的引擎实现是NFA自动机，它将在字符匹配期间执行回溯。 
+
+**5、**线程上下文切换; 有许多已启动的线程，这些线程的状态在Blocked（锁定等待，IO等待等）和Running之间发生变化。当锁争用激烈时，这种情况很容易发生。 
+
+**6、**有些线程正在执行非阻塞操作，例如 `while(true)`语句。如果在程序中计算需要很长时间，则可以使线程休眠。
 
 ### 如何查找内存泄漏
 
-将进程堆的情况jmap -dump下来，使用分析工具进行分析，找到发生内存占用过大的对象。]
+将进程堆的情况jmap -dump下来，使用分析工具进行分析，找到发生内存占用过大的对象。
 
 ## OOM原因
 
@@ -293,33 +299,6 @@ Jconsole：可以以图表化的形式显示各种数据
 #### java.lang.OutOfMemoryError: Direct buffer memory
 
 本机直接内存溢出
-
-
-
-# J2EE
-
-## JavaWeb三大组件（Servlet、Filter、Listener）
-
-1、Servlet 
-Servlet是用来处理客户端请求的动态资源
-
-2、Filter 
-
-filter主要负责拦截请求
-
-3、Listener 
-
-Listener就是监听器，它可以监听Application、Session、Request对象，当这些对象发生变化就会调用对应的监听方法。 
-
-## Listener,Filter,Servlet执行顺序
-
-listener->Filter->servlet(理发师)
-
-## Servlet生命周期
-
-Web容器加载Servlet并将其实例化后，Servlet生命周期开始，容器运行其init()方法进行Servlet的初始化；请求到达时调用Servlet的service()方法，service()方法会根据需要调用与请求对应的doGet或doPost等方法；当服务器关闭或项目被卸载时服务器会将Servlet实例销毁，此时会调用Servlet的destroy()方法。
-
-
 
 # Spring
 
@@ -378,6 +357,7 @@ IOC 或 依赖注入把应用的代码量降到最低。IOC容器支持加载服
 a依赖于b，将b传入a就是依赖注入。
 
 #### 有哪些不同类型的依赖注入方式？
+
 a.接口注入
 b.setter方法注入
 c.构造方法注入
@@ -396,6 +376,7 @@ d.注解注入：基于反射原理
 3. 显然接下来，开始去初始化B的对象，同样的手法，到设置属性阶段，发现需要A对象 
 4. 于是乎，spring又开始去初始化对象A的依赖，此时先从缓存singletonObjects去取，没有再去看是否正处于初始阶段，是则再从缓存earlySingletonObjects中取，再没有，是则从singletonFactories三级缓存中取 
 5. 将早期对象A设置到B中，再把B设置到A中
+
 #### 解释Spring支持的几种bean的作用域。
 
 Spring框架支持以下五种bean的作用域：
@@ -466,6 +447,7 @@ AOP核心就是切面，它将多个类的通用行为封装成可重用的模�
 public @interface AnalysisActuator {
 }
 ```
+
 ```java
 @Aspect
 @Component
@@ -546,6 +528,7 @@ Spring 配备构建Web 应用的全功能MVC框架。Spring可以很便捷地和
 ![SpringMVCè¿è¡åç](md\38.jpg)
 
 #### Spring和SpringMVC的关系
+
 那么SpringMVC子容器用来注册web组件的Bean，如控制器、处理器映射、视图解析器等。而Spring用来注册其他Bean，这些Bean通常是驱动应用后端的中间层和数据层组件。
 
 #### 为什么要使用springmvc

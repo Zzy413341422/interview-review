@@ -521,11 +521,7 @@ CAS适用于写比较少的情况下（多读场景，冲突一般较少），sy
 
 #### 谈谈 synchronized和ReenTrantLock 的区别
 
-1.两者都是可重入锁
-2.synchronized 依赖于 JVM ，而 ReenTrantLock 依赖于 API
-3.ReenTrantLock一.等待可中断；二.可实现公平锁；
-4.synchroniezd执行完自动释放锁，ReenTrantLock需要unlock
-5.synchroniezd可以修饰类和用在代码块
+![](C:\Users\jimmiezeng\Downloads\interview-review-master\interview-review-master\md\82.png)
 
 #### Reentrantreadwitelock（读写锁）
 
