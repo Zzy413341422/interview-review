@@ -216,14 +216,7 @@ where (select COUNT(1) from score b where b.c_id=a.c_id and b.s_score>=a.s_score
 
 SELECT id,title,content **FROM** items **WHERE** id IN (**SELECT** id **FROM** items **ORDER** **BY** id limit 900000, 10);  
 
-## 本月，今日查询
-
-```sql
-本月：
-SELECT * FROM 表名 WHERE DATE_FORMAT( 时间字段名, "%Y%m" ) = DATE_FORMAT( NOW( ) , "%Y%m" )
-昨天：
-SELECT * FROM 表名 WHERE TO_DAYS( NOW( ) ) - TO_DAYS( 时间字段名) <= 1
-```
+不加order by会走全表
 
 ## 一个 SQL 执行的很慢的原因
 
