@@ -75,6 +75,12 @@ B+树的数据都存储在叶子结点中，分支结点均为索引，方便扫
 
 对于查询中很少涉及的列或者重复值比较多的列，不宜建立索引。
 
+## 几种数据库对比
+
+![](C:\Users\jimmiezeng\IdeaProjects\interview-review\md\83.png)
+
+es分页处理十分十分慢！
+
 ## 数据库引擎有哪些？InnoDB和MyIsam有啥区别?
 
 MyISAM InnoDB MEMORY MERGE BDB；
@@ -239,27 +245,7 @@ SELECT id,title,content **FROM** items **WHERE** id IN (**SELECT** id **FROM** i
 ## explain的type类型
 
 
-const
-查找主键索引，返回的数据至多一条（0或者1条）。 属于精确查找
-
-eq_ref
-查找唯一性索引，返回的数据至多一条。属于精确查找
-
-
-ref
-查找非唯一性索引，返回匹配某一条件的多条数据。属于精确查找、数据返回可能是多条
-
-
-range
-查找某个索引的部分索引，一般在where子句中使用 < 、>、in、between等关键词。只检索给定范围的行，属于范围查找
-
-
-index
-查找所有的索引树，比ALL要快的多，因为索引文件要比数据文件小的多。
-
-
-ALL
-不使用任何索引，进行全表扫描，性能最差。
+![](C:\Users\jimmiezeng\IdeaProjects\interview-review\md\82.png)
 
 ## SQL优化
 
@@ -333,6 +319,10 @@ char是一种固定长度的类型，varchar则是一种可变长度的类型
 ## 什么是Redis？
 
 Redis本质上是一个Key-Value类型的内存数据库,因为是纯内存操作，Redis的性能非常出色，每秒可以处理超过 10万次读写操作，是已知性能最快的Key-Value DB。
+
+## Redis多线程的设计
+
+Redis 的多线程部分只是用来处理网络数据的读写和协议解析，执行命令仍然是单线程。之所以这么设计是不想因为多线程而变得复杂，需要去控制 key、lua（一种轻量级脚本语言）、事务，LPUSH/LPOP（redis语法：将一个或多个值插入到列表头部（左边）、移出并获取列表的第一个元素(左边)） 等等的并发问题。
 
 ## Redis相比memcached有哪些优势?
 
