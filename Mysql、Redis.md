@@ -220,9 +220,7 @@ where (select COUNT(1) from score b where b.c_id=a.c_id and b.s_score>=a.s_score
 
 ## limit 20000，10如何优化
 
-SELECT id,title,content **FROM** items **WHERE** id IN (**SELECT** id **FROM** items **ORDER** **BY** id limit 900000, 10);  
-
-不加order by会走全表
+SELECT id,title,content **FROM** items **WHERE** id IN (**SELECT** id **FROM** items **ORDER** **BY** id limit 900000, 10); 
 
 ## 一个 SQL 执行的很慢的原因
 
