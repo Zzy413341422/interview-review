@@ -50,7 +50,7 @@ Character,    Byte，Short，Long 的缓存池范围默认都是: -128 到 127�
 ```java
 Class stuClass = Class.forName("fanshe.field.Student");
 ```
-反射就是程序运行期间JVM可以获取一个类的属性和方法。依靠此机制，可以动态的创建一个类的对象和调用对象的方法。
+反射就是程序运行期间JVM可以获取一个类的字段和方法和注释。依靠此机制，可以动态的创建一个类的对象和调用对象的方法。
 
 缺点是反射的效率很低，而且会破坏封装，通过反射可以访问类的私有方法，不安全。
 
@@ -65,7 +65,7 @@ Class stuClass = Class.forName("fanshe.field.Student");
         stuProxy.giveMoney();
 ```
 
-Java动态代理的优势是实现无侵入式的代码扩展，也就是方法的增强；
+Java动态代理比静态代理的优势是实现无侵入式的代码扩展，也就是方法的增强；
 
 ## 泛型
 
