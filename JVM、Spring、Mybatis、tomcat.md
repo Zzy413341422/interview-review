@@ -344,6 +344,14 @@ Spring IOC 负责创建对象，管理对象，并且管理这些对象的整个
 
 IOC 或 依赖注入把应用的代码量降到最低。IOC容器支持加载服务时的饿汉式初始化和懒加载。
 
+#### SpringIOC的优点？
+
+1. 对象提供了n个构造器, 实例化如何选择构造器? 构造器内所需参数也是bean, 该如何处理? 在beanDefinition中定义了构造器的参数, 构造器又该怎么选择?(AutowiredAnnotationBeanPostProcessor#determineCandidateConstructors了解下>
+2. 对象间需要循环依赖怎么处理? 当循环依赖的对象又都需要被代理, 又怎么处理? 当这些对象生成后客户需要继续对这些对象再处理又该怎么处理? 
+3. @Configuration标注的配置类如何避免重复创建对象? Spring中各种关系怎么处理?[@Conditional, @DependsOn, @Import(import其他后置处理器又该怎么处理>]
+4. 用户需要自定义bean到容器里, 如何提供扩展? 允许bean整个生命周期进行干涉, 又如何扩展?([@Autowired, @Resource]注解也只是扩展, 源码里删掉处理@Autowired的后置处理器照样跑>
+5. 允许用户直接设置bean属性, 值可以设置任意对象, 当所需值是[class, bean, 原型bean, 集合容器, 泛型, File, Resource]时如何处理?
+
 #### ApplicationContext通常的实现是什么?
 
 •	FileSystemXmlApplicationContext ：此容器从一个XML文件中加载beans的定义，XML Bean 配置文件的全路径名必须提供给它的构造函数。
