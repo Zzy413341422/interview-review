@@ -89,15 +89,6 @@ equal		hashCode		wait		notify		notifyAll		toString		clone		getClass		finalize
 
 ![img](md\4.png)
 
-## 重载和重写的区别
-
-重载： 发生在同一个类中，方法名必须相同，参数必须不同，方法返回值和访问修饰符可以不同
-重写： 发生在父子类中，方法名、参数列表必须相同
-
-- 子类方法的访问权限必须大于等于父类方法；
-- 子类方法的返回类型必须是父类方法返回类型或为其子类型。
-- 子类方法抛出的异常类型必须是父类抛出异常类型或为其子类型。
-
 ## 为什么java不支持多继承
 
 1.
@@ -155,42 +146,6 @@ String可变相当于废了缓存池，影响速度。并且也有String中也�
 
 值传递是指将值的副本传递给调用的函数，调用的函数可以改变副本的值，但是并不会影响main函数中的原值。 引用传值，传递的是对象的引用，同一个引用指向相同的实体，所以改变引用指向实体的值，可以影响main函数中实体的值。
 
-## 枚举
-
-枚举就是在一个类里定义几个常量，每个常量都是这个类的实例，用于替代常量类。
-
-你可以像使用普通 Java 类一样来使用枚举类型。所有的*枚举*都*继承*自*java*.lang.*Enum*类。可以实现接口，写方法；
-
-```java
-public enum  ResultEnum {
-    CLASS_ZERO(0,"此课程已被人选完");
-    private Integer code;
-    private String message;
-    ResultEnum(Integer code, String message) {
-        this.code = code;
-        this.message = message;
-    }
-}
-```
-
-## 内部类，静态内部类
-
-一个.java文件中可以有多个同级类，该文件同级的类之间可以互相调用，但是除了public的类，其他不能够在其他文件调用。
-
-```java
-public class Test{
-    public static void main(String[] args){
-        Bean2 b2 = new Bean2();
-        Bean bean = new Bean();
-    }
-    static class Bean2{
-        public int J = 0;
-    }
-}
-class Bean{
-}
-```
-
 ## 接口和抽象类的区别是什么 
 
 1.所有方法在接口中不能有实现(Java 8 开始接口方法可以有默认实现），抽象类可以有非抽象的方法（不可实现）和非抽象方法（必须实现）
@@ -209,18 +164,6 @@ class Bean{
 2. 从变量在内存中的存储方式来看，成员变量是对象的一部分，而对象存在于堆内存，局部变量存在于栈内存
 3. 从变量在内存中的生存时间上看，成员变量是对象的一部分，它随着对象的创建而存在，而局部变量随着方法的调用而自动消失。
 4. 成员变量如果没有被赋初值，则会自动以类型的默认值而赋值（一种情况例外被 final 修饰的成员变量也必须显示地赋值）；而局部变量则不会自动赋值。
-
-## 构造方法有哪些特性
-
-1. 名字与类名相同；
-2. 没有返回值，但不能用void声明构造函数；
-3. 生成类的对象时自动执行，无需调用。
-
-## 静态方法和实例方法有何不同
-
-1.在外部调用静态方法时，可以使用"类名.方法名"的方式，也可以使用"对象名.方法名"的方式。而实例方法只有后面这种方式。也就是说，调用静态方法可以无需创建对象。
-
-2.静态方法在访问本类的成员时，只允许访问静态成员（即静态成员变量和静态方法），而不允许访问实例成员变量和实例方法；实例方法则无此限制
 
 ## Java 中的异常处理
 
@@ -416,7 +359,7 @@ CAS适用于写比较少的情况下（多读场景，冲突一般较少），sy
 
 #### 谈谈 synchronized和ReenTrantLock 的区别
 
-![](C:\Users\jimmiezeng\Downloads\interview-review-master\interview-review-master\md\82.png)
+![](md\82.png)
 
 #### Reentrantreadwitelock（读写锁）
 
@@ -558,7 +501,7 @@ RejectedExecutionHandler类型的变量，表示线程池的饱和策略。
 
 #### 线程池执行过程：
 
- [12.jfif](md\12.jfif) ![è¿éåå¾çæè¿°](https://img-blog.csdn.net/20170618213838961?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvdTAxMTI0MDg3Nw==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
+ ![è¿éåå¾çæè¿°](https://img-blog.csdn.net/20170618213838961?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvdTAxMTI0MDg3Nw==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
 
 #### 线程池调优:
 

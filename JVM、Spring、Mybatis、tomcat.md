@@ -379,11 +379,11 @@ d.注解注入：基于反射原理
 
 #### spring是如何解决循环依赖：
 
-1. 在finishBeanFactoryInitialization中，开始初始化A，毋庸置疑通过反射 
-2. 之后A开始设置属性字段，此时发现需要一个B的对象。同时已标记A处于正在初始化阶段 
-3. 显然接下来，开始去初始化B的对象，同样的手法，到设置属性阶段，发现需要A对象 
-4. 于是乎，spring又开始去初始化对象A的依赖，此时先从缓存singletonObjects去取，没有再去看是否正处于初始阶段，是则再从缓存earlySingletonObjects中取，再没有，是则从singletonFactories三级缓存中取 
-5. 将早期对象A设置到B中，再把B设置到A中
+![](md\85.png)
+
+###### 第二级缓存earlySingletonObjects的作用
+
+每次都通过工厂去拿，需要遍历所有的后置处理器、判断是否创建代理对象，而判断是否创建代理对象本身也是一个复杂耗时的过程。设计二级缓存避免再次调用调用getEarlyBeanReference方法，提高bean加载流程。
 
 #### 解释Spring支持的几种bean的作用域。
 
