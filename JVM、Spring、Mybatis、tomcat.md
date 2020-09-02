@@ -381,6 +381,28 @@ d.注解注入：基于反射原理
 
 ![](md\85.png)
 
+    protected Object getSingleton(String beanName, boolean allowEarlyReference) {
+        // 1. 尝试去一级缓存中加载我们的bean，IOC容器初始化加载单例bean的时候，第一次进来都会返回null，一级缓存保存的已经处理完成的对象
+        Object singletonObject = this.singletonObjects.get(beanName);
+        if (singletonObject == null && this.isSingletonCurrentlyInCreation(beanName)) {
+            synchronized(this.singletonObjects) {
+                // 2. 一级缓存找不到从二级缓存中查找
+                singletonObject = this.earlySingletonObjects.get(beanName);
+                if (singletonObject == null && allowEarlyReference) {
+                    // 3. 二级缓存中找不到去三级缓存中查
+                    ObjectFactory<?> singletonFactory = (ObjectFactory)this.singletonFactories.get(beanName);
+                    if (singletonFactory != null) {
+                        singletonObject = singletonFactory.getObject();
+                        // 获取的还没实例化完成的单例bean会被放入二级缓存
+                        this.earlySingletonObjects.put(beanName, singletonObject);		
+                        // 移除三级缓存中指定的bean
+                        this.singletonFactories.remove(beanName);
+                    }
+                }
+            }
+        }
+        return singletonObject;
+    }
 ###### 第二级缓存earlySingletonObjects的作用
 
 每次都通过工厂去拿，需要遍历所有的后置处理器、判断是否创建代理对象，而判断是否创建代理对象本身也是一个复杂耗时的过程。设计二级缓存避免再次调用调用getEarlyBeanReference方法，提高bean加载流程。
