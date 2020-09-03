@@ -638,16 +638,26 @@ Spring Boot启动扫描所有jar包的META-INF/spring.factories中配置的 Enab
 （4）Connector用于接受请求并将请求封装成Request和Response来具体处理； 
 （5）Container用于封装和管理Servlet，以及具体处理request请求；
 
+#### 自定义类加载器的原因
+
+为了在载入类中指定某些规则: 缓存已经载入成功或失败的类;
+为了实现类的重载，开启了一个线程来监控类的变化，每隔15秒更新一次。
+
+#### 自定义类加载器
+
+第一个是Tomcat自身所使用的类加载器CommonClassLoader，会加载jre的lib包及tomcat的lib包的类，遵循类加载的双亲委派机制；
+
+第二个是每个Web应用程序用的，每个web应用程序都有自己专用的WebappClassLoader，优先加载/web-inf/lib下的jar中的class文件，这样就隔离了每个web应用程序的影响，但是webappClassLoader可以设置为不遵循类加载的双亲委派机制。
+
+#### WebappClassLoader
+
+WebappClassLoader的设计方案考虑了优化和安全两方面。例如，它会缓存之前已经载入的类来提升性能。此外，它还会缓存加载失败的类的名字，这样，当再次请求加载同一个类时，类载入器就会直接抛出ClassNotFoundException异常，而不会再尝试查找该类了。
+
 #### tomcat优化
 
 **一:Tomcat 内存优化,启动时告诉JVM我要一块大内存(调优内存是最直接的方式)**
 
-**二:Tomcat 线程优化** 在server.xml中 如:
-
-```
-<Connector port="80" protocol="HTTP/1.1" maxThreads="600" minSpareThreads="100" maxSpareThreads="500" acceptCount="700"
-connectionTimeout="20000"  />
-```
+**二:Tomcat 线程优化** 
 
 maxThreads="X" 表示最多同时处理X个连接
 
@@ -659,5 +669,5 @@ acceptCount="X" 当同时连接的人数达到maxThreads时,还可以排队,队�
 
 **三:Tomcat IO优化**
 
-在server.xml中修改protocol实现（APR,BIO,NIO,AIO）
+中修改protocol实现（APR,BIO,NIO,AIO）
 
