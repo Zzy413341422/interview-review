@@ -67,6 +67,25 @@ Class stuClass = Class.forName("fanshe.field.Student");
 
 Java动态代理比静态代理的优势是实现无侵入式的代码扩展，也就是方法的增强；
 
+## 动态代理的原理
+
+ 1、根据代理类接口先得到代理类的类全限名、方法列表、异常列表
+ 2、根据步骤1中的类全限名、方法列表、异常列表、接口列表生成class文件格式的字节流，其中方法的实现会最终调用InvoationHanlder的invoke方法
+ 3、使用类加载器加载步骤2中的字节流，创建生成动态代理类对象
+ 4、使用步骤3中创建生成的代理类对象
+
+## 反射的原理
+
+
+
+## 编译
+
+编译分为 前端编译 和 后端编译 两个部分。简单来说，前端编译的任务是：将Java源程序编译为Class文件；后端编译的任务是：由JVM的解释器 解释执行Class文件。
+
+## 反编译
+
+Java语言中的反编译一般指将class文件转换成java文件。
+
 ## 泛型
 
 泛型方法：定义泛型方法时，必须在返回值前边加一个<T>，来声明这是一个泛型方法，还得有一个泛型对象参数
@@ -538,6 +557,21 @@ FutureTask <Integer> result2 = mExecutor.submit(new Callable<Integer>() {
 1)execute() 方法用于提交不需要返回值的任务，所以无法判断任务是否被线程池执行成功与否；
 2)submit()方法用于提交需要返回值的任务。线程池会返回一个future类型的对象，通过这个future对象可以判断任务是否执行成功，并且可以通过future的get()方法来获取返回值，get()方法会阻塞当前线程直到任务完成，而使用 get（long timeout，TimeUnit unit）方法则会阻塞当前线程一段时间后立即返回，这时候有可能任务没有执行完。
 
+#### 线程池复用原理
+
+```
+while (task != null || (task = getTask()) != null) {}
+getTask（）{
+	Runnable r = timed ?
+                workQueue.poll(keepAliveTime, TimeUnit.NANOSECONDS) :
+                workQueue.take();//阻塞队列
+}
+```
+
+#### 多个核心线程去take阻塞队列中线程，谁能拿到了？
+
+阻塞队列由ReentrantLock和Condition实现，因此可实现阻塞的公平锁和非公平锁。
+
 ## Atom:
 
 #### AtomicInteger 线程安全原理简单分析
@@ -632,12 +666,13 @@ java.util.concurrent.BlockingQueue的特性是：当队列是空的时，从队�
 
 remove   移除并返回队列头部的元素，没有则抛出一个异常
 poll          移除并返问队列头部的元素，没有则返回null
-take         移除并返回队列头部的元素，没有则阻塞
+take         移除并返回队列头部的元素，没有则自旋
+
 add          增加一个元索，满则抛出一个异常
 offer        添加一个元素，如果队列已满，则返回false
-put           添加一个元素，如果队列满，则阻塞
-element  返回队列头部的元素，如果队列为空，则抛出一个异常
+put           添加一个元素，如果队列满，则自旋
 
+element  返回队列头部的元素，如果队列为空，则抛出一个异常
 peek        返回队列头部的元素，如果队列为空，则返回null
 
 ## ThreadLocal及其引发的内存泄露
@@ -682,7 +717,7 @@ loadFactor太大导致查找元素效率低，太小导致数组的利用率低
 
 #### HashMap 扩容原理
 
-resize 就是自动扩容，当 size 达到阈值以后会扩容到原来的 2 倍，关键代码 newCap = oldCap << 1。但是这里有一个非常巧妙的解决方法，因为扩容是扩充的 2 倍，n-1 转换为二进制也就是高位变成了1，那么根据(n - 1) & hash 计算，如果 hash 高位是 1 那么新的 index 位置就是 oldIndex + 16，如果hash 的高位 是 0 ，那么 index 的位置就是原来的 oldIndex 的位置，这样直接判断高位就可以了，省去了重新计算hash。
+resize 就是自动扩容，当当前数据存储的数量（即size()）大小必须大于等于阈值；并且当前加入的数据是否发生了hash冲突。以后会扩容到原来的 2 倍，关键代码 newCap = oldCap << 1。但是这里有一个非常巧妙的解决方法，因为扩容是扩充的 2 倍，n-1 转换为二进制也就是高位变成了1，那么根据(n - 1) & hash 计算，如果 hash 高位是 1 那么新的 index 位置就是 oldIndex + 16，如果hash 的高位 是 0 ，那么 index 的位置就是原来的 oldIndex 的位置，这样直接判断高位就可以了，省去了重新计算hash。
 
 #### HashMap什么时候扩容
 

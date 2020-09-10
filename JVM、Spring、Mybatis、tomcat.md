@@ -135,8 +135,6 @@ jdk8默认Parallel Scavenge + Serial Old jdk9默认g1
 
 ![img](md\80.jpg)
 
-
-
 缺点：标记-清除算法导致的空间碎片
 
 由于CMS并发清理阶段用户线程还在运行着，伴随程序运行自然就还会有新的垃圾不断产生。
@@ -324,11 +322,6 @@ FactoryBean也是接口，主要用于返回BeanFactory生产好的bean对象，
 
 BeanFactory负责读取bean配置文档，管理bean的加载，实例化，维护bean之间的依赖关系，负责bean的声明周期。
 
-ApplicationContext是由BeanFactory派生，除了提供上述BeanFactory所能提供的功能之外，还提供了更完整的框架功能：
-a. 国际化支持
-b. AOP支持
-c. 其他组件如SpringMVC的支持
-
 #### Spring使用如何解决线程安全问题?
 
 1、在Controller中使用ThreadLocal变量
@@ -379,7 +372,7 @@ d.注解注入：基于反射原理
 
 #### spring是如何解决循环依赖：
 
-![](md\85.png)
+![](md\87.jpg)
 
     protected Object getSingleton(String beanName, boolean allowEarlyReference) {
         // 1. 尝试去一级缓存中加载我们的bean，IOC容器初始化加载单例bean的时候，第一次进来都会返回null，一级缓存保存的已经处理完成的对象
@@ -511,29 +504,6 @@ public class AnalysisActuatorAspect {
 **基于 @Transactional 的全注解方式：** 将声明式事务管理简化到了极致。开发人员只需在配置文件中加上一行启用相关后处理 Bean 的配置，然后在需要实施事务管理的方法或者类上使用 @Transactional 指定事务规则即可实现事务管理，而且功能也不比其他方式逊色。
 
 **@Transactional**(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, readOnly = **false**, timeout = -1) （Isolation设置隔离级别）
-
-#### Spring事务传播机制：
-
-PROPAGATION_REQUIRED
-有事务就用已有的，没有就重新开启一个
-
-PROPAGATION_SUPPORTS
-有事务就用已有的，没有也不会重新开启
-
-PROPAGATION_MANDATORY
-必须要有事务，没事务抛异常
-
-PROPAGATION_REQUIRES_NEW
-开启新事务，若当前已有事务，挂起当前事务
-
-PROPAGATION_NOT_SUPPORTED
-不需要事务，若当前已有事务，挂起当前事务
-
-PROPAGATION_NEVER
-不需要事务，若当前已有事务，抛出异常
-
-PROPAGATION_NESTED
-嵌套事务，如果外部事务回滚，则嵌套事务也会回滚！！！外部事务提交的时候，嵌套它才会被提交。嵌套事务回滚不会影响外部事务。
 
 ## Spring注解
 
