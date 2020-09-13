@@ -221,6 +221,8 @@ Full GC：
 
 ![ClassLoader](md\26.png)
 
+## 不同的类加载器在方法区有对应相对隔离的空间
+
 ## 双亲委派模型
 
 BootstrapClassLoader：Java类加载层次中最顶层的类加载器，负责加载JDK中的核心类库
