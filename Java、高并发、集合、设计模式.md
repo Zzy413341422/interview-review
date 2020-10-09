@@ -4,8 +4,6 @@
 
 ![1](md\1.png)
 
-![2](md\2.jpg)
-
 ## 面向对象和面向过程的区别
 
 面向过程
@@ -43,7 +41,7 @@ Character,    Byte，Short，Long 的缓存池范围默认都是: -128 到 127�
 ```java
 Class stuClass = Class.forName("fanshe.field.Student");
 ```
-反射就是程序运行期间JVM可以获取一个类的字段和方法和注释。依靠此机制，可以动态的创建一个类的对象和调用对象的方法。
+反射就是程序运行期间JVM可以从方法区获取一个类的对象，进而获取字段和方法和注释。依靠此机制，可以动态的创建一个类的对象和调用对象的方法。
 
 缺点是反射的效率很低，而且会破坏封装，通过反射可以访问类的私有方法，不安全。
 
@@ -66,10 +64,6 @@ Java动态代理比静态代理的优势是实现无侵入式的代码扩展，�
  2、根据步骤1中的类全限名、方法列表、异常列表、接口列表生成class文件格式的字节流，其中方法的实现会最终调用InvoationHanlder的invoke方法
  3、使用类加载器加载步骤2中的字节流，创建生成动态代理类对象
  4、使用步骤3中创建生成的代理类对象
-
-## 反射的原理
-
-
 
 ## 编译
 
@@ -342,24 +336,34 @@ synchronized与java.util.concurrent包中的ReentrantLock相比，由于JDK1.6�
 修饰静态方法，作用于当前类对象加锁，进入同步代码前要获得当前类对象的锁 
 修饰代码块
 
-#### CAS和synchronized的取舍
-
-CAS适用于写比较少的情况下（多读场景，冲突一般较少），synchronized适用于写比较多的情况下（多写场景，冲突一般较多）
-
 #### ReentrantLock的基本实现
 
-先通过CAS尝试获取锁。如果此时已经有线程占据了锁，那就加入CLH队列并且被挂起。当锁被释放之后，排在CLH队列队首的线程会被唤醒，然后CAS再次尝试获取锁。在这个时候，如果：
+先通过CAS尝试获取锁。如果此时已经有线程占据了锁，那就加入CLH队列。
 
 - 非公平锁：如果同时还有另一个线程进来尝试获取，那么有可能会让这个线程抢先获取；
 - 公平锁：如果同时还有另一个线程进来尝试获取，当它发现自己不是在队首的话，就会排到队尾，由队首的线程获取到锁。
 
 #### 谈谈 synchronized和ReenTrantLock 的区别
 
-![](md\82.png)
+![](md\92.png)
 
 #### Reentrantreadwitelock（读写锁）
 
 读写锁，它维护了一个读锁和一个写锁，可以达到多个读线程可以共享的获取到锁，而此时写线程不能获取到锁，并且当写线程获取到锁时后续的读写都将被阻塞不能获取到锁。
+
+## 乐观锁实现
+
+##### 版本号
+
+update player set coins = {0}, version = version + 1 where player_id = {1} and version = {2}
+
+##### CAS
+
+CAS操作有三个操作数V（内存地址），A（旧的预期值），B（准备设置的新值）。指令执行时先看V指向的内存中存储的值是否和A相同，如果相同才会更新为B，否则什么也不做。
+
+在多个线程同时CAS的情况下是不会发生多个线程CAS成功的情况的，因为计算机底层实现保证了V指向内存的互斥性和立即可见性，可以理解为 CAS操作是底层保证的线程安全
+
+缺点：CAS：ABA问题、CAS自旋消耗CPU、只能保证一个共享变量的原子操作。
 
 ## 各种锁
 
@@ -370,8 +374,6 @@ CAS适用于写比较少的情况下（多读场景，冲突一般较少），sy
 #### 乐观锁
 
 每次去拿数据的时候都认为别人不会修改，所以不会上锁，但是在更新的时候会判断一下在此期间别人有没有去更新这个数据，可以使用版本号机制和CAS算法实现。
-
-缺点：ABA问题、CAS自旋消耗CPU、只能保证一个共享变量的原子操作。
 
 #### 自旋锁
 
@@ -501,9 +503,9 @@ RejectedExecutionHandler类型的变量，表示线程池的饱和策略。
 
 #### 线程池调优:
 
-设置最大线程数，防止线程资源耗尽； 
-使用有界队列，从而增加系统的稳定性和预警能力(饱和策略)； 
-根据任务的性质设置线程池大小：
+1）设置动态线程池。
+
+2）压测。
 
 ##### CPU密集型任务(CPU个数个线程+1)
 
@@ -582,9 +584,19 @@ CAS机制当中使用了3个基本操作数：内存地址V，旧的预期值A�
 
 #### AQS核心思想
 
-如果被请求的共享资源空闲，则将当前请求资源的线程设置为有效的工作线程，并且将共享资源设置为锁定状态。如果被请求的共享资源被占用，那么就需要一套线程阻塞等待以及被唤醒时锁分配的机制，这个机制AQS是用CLH队列锁实现的，即将暂时获取不到锁的线程加入到队列中。 
+AQS是一种提供了原子式管理同步状态、阻塞和唤醒线程功能以及队列模型的简单框架。如果被请求的共享资源空闲，则将当前请求资源的线程设置为有效的工作线程，并且将共享资源设置为锁定状态。如果被请求的共享资源被占用，那么就需要一套线程阻塞等待以及被唤醒时锁分配的机制，这个机制AQS是用CLH队列锁实现的，即将暂时获取不到锁的线程加入到队列中。 
 
 ![AQSåçå¾](md\13.png)
+
+#### AQS阻塞等待以及被唤醒时锁分配的机制
+
+新加入的节点不断自旋如下操作
+
+![](C:\Users\admin\Desktop\all the web\interview-review\md\94.png)
+
+判断↑是否需要阻塞当前线程
+
+![](C:\Users\admin\Desktop\all the web\interview-review\md\95.png)
 
 #### AQS定义两种资源共享方式
 
@@ -608,16 +620,13 @@ CyclicBarrier(循环栅栏)： 让一组线程到达一个屏障时被阻塞，�
 继承Thread类创建线程
 实现Runnable接口创建线程
 实现Callable接口
+线程池
 
 #### Java中如何停止一个线程？
 
-异常法
-
 thread. Interrupt()
 
-调用interrupt可以抛出InterruptedException异常（只在wait状态时），不然只是将线程标记为可终止状态。
-
-if(this.interrupted())  throw new InterruptedException();
+if(this.interrupted()) {do end};
 
 #### 说说wait,yield,sleep,join?
 
@@ -895,17 +904,9 @@ public enum Singleton {
 
 ## 结构性模式
 
-桥接模式：**将抽象与实现分离开，使它们可以独立变化**
-
 装饰者模式：**重点在于功能的扩展，添加额外的职责**.
 
 适配器模式：**使得原本不兼容，不能够一起工作的那些类能够一起工作**
-
-外观模式：**原本兼容的类组合在一起更加简单地工作**
-
-代理模式：**为其他对象提供一种代理对象以控制对这个对象的访问**
-
-组合模式：**用于描述“整体-部分”的概念**
 
 #### 装饰者模式：
 
@@ -920,20 +921,6 @@ public class Decorator implements Component{
        }
 }
 
-```
-
-#### 桥接模式：
-
-```Java
-public class Decorator extends AbsractClass{
-        private Component component;（接口）
-        public Decorator(Component component){
-            this.component = component
-        }
-       public void operation(){
-            component.operation();
-       }
-}
 ```
 
 #### 适配器模式：
@@ -970,23 +957,6 @@ public class VoltAdapter implements Volt5 {
     }
 }
 ```
-
-#### 外观模式：
-
-![../_images/Facade.jpg](md\18.jpg)
-
-#### 组合模式：
-
-```java
-public class Employee {
-	private String name;
-    private String dept;
-    private int salary;
-    private List<Employee> subordinates;//部下
-}
-```
-
-## 行为型模式
 
 #### 观察者模式：
 
@@ -1034,7 +1004,18 @@ class BinaryObserver extends Observer{
 }
 ```
 
-#### 迭代器模式：
+### 设计模式相关问题： 
 
-迭代器模式就是分离了集合对象的遍历行为，抽象出一个迭代器类来负责	
+ 1、请列举出在JDK中几个常用的设计模式？ 
 
+
+
+ 4、在 Java 中，什么叫观察者设计模式（observer design pattern）？ 
+
+ 5、使用工厂模式最主要的好处是什么？在哪里使用？ 
+
+ 6、举一个用 Java 实现的装饰模式(decorator design pattern)？它是作用于对象层次还是类层次？ 
+
+
+
+   8、举例说明什么情况下会更倾向于使用抽象类而不是接口？

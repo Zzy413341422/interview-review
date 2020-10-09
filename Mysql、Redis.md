@@ -375,20 +375,6 @@ Redis本质上是一个Key-Value类型的内存数据库,因为是纯内存操�
 
 Redis 的多线程部分只是用来处理网络数据的读写和协议解析，执行命令仍然是单线程。之所以这么设计是不想因为多线程而变得复杂，需要去控制 key、lua（一种轻量级脚本语言）、事务，LPUSH/LPOP（redis语法：将一个或多个值插入到列表头部（左边）、移出并获取列表的第一个元素(左边)） 等等的并发问题。
 
-## Redis相比memcached有哪些优势?
-
-(1) memcached所有的值均是简单的字符串，redis作为其替代者，支持更为丰富的数据类型
-(2) redis的速度比memcached快很多
-(3) redis可以持久化其数据
-
-## Redis和mongoDB区别？
-
-(1)mongoDb文档型数据数据库，可以存储海量数据
-
-(2)redis使用纯内存操作，速度更好；mongoDB也可以将热点数据映射到内存；
-
-(3)都支持事务
-
 ## Redis支持哪几种数据类型？ 
 
 #### 3.1 字符串(string)
@@ -666,9 +652,11 @@ NGINX流量统计->流量重现
 
 Redis可以通过创建快照来获得存储在内存里面的数据在某个时间点上的副本。
 
+1 在指定的时间间隔内，执行指定次数的写操作2、执行几种指令都会触发rdb
+
 ## AOF（append-only file）持久化
 
-开启AOF持久化后每执行一条会更改Redis中的数据的命令，Redis就会将该命令写入硬盘中的AOF文件。
+always：同步持久化，每次发生数据变化会立刻写入到磁盘中。性能较差当数据完整性比较好（慢，安全）everysec：出厂默认推荐，每秒异步记录一次（默认值）
 
 ## redis发布订阅模式
 
@@ -687,5 +675,8 @@ zincrby list score A;
 Redis Sentinal着眼于高可用，在master宕机时会自动将slave提升为master，继续提供服务。
 Redis Cluster着眼于扩展性，在单个redis内存不足时，使用Cluster进行分片存储。
 
+## ES
 
+![](md\96.png)
 
+![](md\95.jpg)
