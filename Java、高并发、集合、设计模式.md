@@ -592,11 +592,11 @@ AQS是一种提供了原子式管理同步状态、阻塞和唤醒线程功能�
 
 新加入的节点不断自旋如下操作
 
-![](C:\Users\admin\Desktop\all the web\interview-review\md\94.png)
+![](md\94.png)
 
 判断↑是否需要阻塞当前线程
 
-![](C:\Users\admin\Desktop\all the web\interview-review\md\95.png)
+![](md\95.png)
 
 #### AQS定义两种资源共享方式
 

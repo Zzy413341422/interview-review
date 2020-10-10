@@ -1,5 +1,3 @@
- 
-
 # Jvm虚拟机
 
 ## 介绍下Java内存区域
@@ -260,6 +258,8 @@ Jconsole：可以以图表化的形式显示各种数据
 jvm内存大小如何设置 https://www.cnblogs.com/zhangfengshi/p/11343102.html
 
 ### 如何排查cpu100%
+
+top -> top -Hp PID ->（找到最高的线程26045） jstack -l 26045 > ./26045.stack  ->（线程id转为16进制65be）  -> cat 26045.stack ｜ grep '65be' -C 20
 
 **1、**频繁的GC; 如果访问量很高，可能会导致频繁的GC甚至FGC。当调用量很大时，内存分配将如此之快以至于GC线程将连续执行，这将导致CPU飙升。
 
