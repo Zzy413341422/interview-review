@@ -592,6 +592,12 @@ MULTI(开启事务)EXEC(提交)DISCARD(回滚)
 
 expire persist
 
+## Redisson Watch DOG
+
+ leaseTime 必须是 -1 才会开启 Watch Dog 机制，也就是如果你想开启 Watch Dog 机制必须使用默认的加锁时间为 30s。如果你自己自定义时间，超过这个时间，锁就会自定释放，并不会延长。
+
+Watch Dog 机制其实就是一个后台定时任务线程，获取锁成功之后，会将持有锁的线程放入到一个 RedissonLock.EXPIRATION_RENEWAL_MAP里面，然后每隔 10 秒 （internalLockLeaseTime / 3） 检查一下，如果客户端 1 还持有锁 key（判断客户端是否还持有 key，其实就是遍历 EXPIRATION_RENEWAL_MAP 里面线程 id 然后根据线程 id 去 Redis 中查，如果存在就会延长 key 的时间），那么就会不断的延长锁 key 的生存时间。
+
 ## **Redis**如何做内存优化？
 
 尽可能使用散列表（hashes），hashes使用的内存非常小，所以你应该尽可能的将你的数据模型抽象到一个散列表里面。
