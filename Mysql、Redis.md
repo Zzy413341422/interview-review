@@ -295,6 +295,16 @@ SELECT id,title,content **FROM** items **WHERE** id IN (**SELECT** id **FROM** i
 
 2、排序问题
 
+3、连表查询问题
+
+4、跨节点的count,order by,group by以及聚合函数问题
+
+5、数据迁移，容量规划，扩容等问题
+
+6、ID问题
+
+7、分库数量
+
 ## 分库分表如何迁移
 
 阶段一：程序数据双写，读旧库，迁移历史数据。DBA在业务低峰期使用mysqldump或mydumper导出并导入数据
@@ -489,6 +499,12 @@ intset->hashtable
 #### 3.5. 有序集合(zset)
 
 > 有序集合用到的编码：ziplist和skiplist
+
+使用跳表不使用红黑树原因
+
+skiplist 虽然更耗内存（每个节点需要存储 level 指针），但是内存消耗不是很大
+zset 一般使用 zrange 来进行范围查询，skiplist 的范围查询相比平衡树（红黑树）对 cache 更友好
+实现简单
 
 大家可能很好奇阿，ziplist的entry中只有属性content可以存放数据，集合也是`key-value`形式，那怎么存储呢?
 
