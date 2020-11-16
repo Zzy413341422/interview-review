@@ -133,7 +133,7 @@ jdk8默认Parallel Scavenge + Serial Old jdk9默认g1
 
 ![img](md\80.jpg)
 
-缺点：标记-清除算法导致的空间碎片
+缺点：标记-清除算法导致的空间碎片，可以配置n次Full GC后压缩空间
 
 由于CMS并发清理阶段用户线程还在运行着，伴随程序运行自然就还会有新的垃圾不断产生。
 
@@ -160,7 +160,7 @@ jdk8默认Parallel Scavenge + Serial Old jdk9默认g1
 ## Minor Gc和Full GC 有什么不同呢？
 
 Minor GC:从年轻代空间（包括 Eden 和 Survivor 区域）回收内存
-Major GC:只收集老年代
+Old GC:只收集老年代
 Full GC:收集整个堆
 
 ## 什么时候触发MinorGC?什么时候触发FullGC?
@@ -256,6 +256,8 @@ Jstat：对其堆的使用情况进行实时的命令行的统计
 Jconsole：可以以图表化的形式显示各种数据
 
 jvm内存大小如何设置 https://www.cnblogs.com/zhangfengshi/p/11343102.html
+
+xmx=xms：避免每次动态扩容都都必须执行一次Full GC
 
 ### 如何排查cpu100%
 

@@ -1006,18 +1006,6 @@ class BinaryObserver extends Observer{
 }
 ```
 
-### 设计模式相关问题： 
+#### Spring中使用到的设计模式
 
- 1、请列举出在JDK中几个常用的设计模式？ 
-
-
-
- 4、在 Java 中，什么叫观察者设计模式（observer design pattern）？ 
-
- 5、使用工厂模式最主要的好处是什么？在哪里使用？ 
-
- 6、举一个用 Java 实现的装饰模式(decorator design pattern)？它是作用于对象层次还是类层次？ 
-
-
-
-   8、举例说明什么情况下会更倾向于使用抽象类而不是接口？
+https://blog.csdn.net/caoxiaohong1005/article/details/80039656
