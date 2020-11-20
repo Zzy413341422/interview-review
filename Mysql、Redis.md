@@ -161,11 +161,11 @@ MyISAM不支持外健，InnoDB支持。
 
 - 首先InnoDB每一行数据还有一个DB_ROLL_PT的回滚指针，用于指向该行修改前的上一个历史版本  
 
-![img](C:/Users/admin/Desktop/all%20the%20web/interview-review/md/30.jpeg)
+![img](md/30.jpeg)
 
  当插入的是一条新数据时，记录上对应的回滚段指针为NULL
 
-![img](C:/Users/admin/Desktop/all%20the%20web/interview-review/md/31.jpeg)
+![img](md/31.jpeg)
 
  更新记录时，原记录将被放入到undo表空间中，并通过DB_ROLL_PT指向该记录。session2查询返回的未修改数据就是从这个undo中返回的。MySQL就是根据记录上的回滚段指针及事务ID判断记录是否可见，如果不可见继续按照DB_ROLL_PT继续回溯查找。
 
@@ -286,6 +286,8 @@ SELECT id,title,content **FROM** items **WHERE** id IN (**SELECT** id **FROM** i
 第五才是水平切分，针对数据量大的表，这一步最麻烦，最能考验技术水平，要选择一个合理的sharding key,为了有好的查询效率，表结构也要改动，做一定的冗余，应用也要改，sql中尽量带sharding key，将数据定位到限定的表上去查，而不是扫描全部的表；
 
 ## 读写分离
+
+单节点转化为集群架构，提升数据库的并发读写性能。
 
 主从复制原理：主库将变更写入 binlog 日志，然后从库连接到主库之后，从库有一个 IO 线程，将主库的 binlog 日志拷贝到自己本地，写入一个 relay 中继日志中。接着从库中有一个 SQL 线程会从中继日志读取 binlog，然后执行 binlog 日志中的内容，也就是在自己本地再次执行一遍 SQL，这样就可以保证自己跟主库的数据是一样的。
 
