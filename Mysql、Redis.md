@@ -297,7 +297,7 @@ SELECT id,title,content **FROM** items **WHERE** id IN (**SELECT** id **FROM** i
 
 2、排序问题
 
-3、连表查询问题
+3、连表查询问题：根据不同维度创建mysql表||查询条件不同用es||查询条件基本一样用hbase：rowkey。
 
 4、跨节点的count,order by,group by以及聚合函数问题
 
