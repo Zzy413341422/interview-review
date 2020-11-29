@@ -95,22 +95,6 @@ equal		hashCode		wait		notify		notifyAll		toString		clone		getClass		finalize
 
 ![img](md\4.png)
 
-## 为什么java不支持多继承
-
-1.
-
-```
-                A foo()    
-               / \    
-             /     \    
- foo() B     C foo()    
-             \     /    
-               \ /    
-               D  foo()
-```
-
-2.使程序设计变得复杂。
-
 ## String 和 StringBuffer、StringBuiler
 
 #### 可变性 　
@@ -177,12 +161,6 @@ Java异常类层次结构图
 
 ![Javaå¼å¸¸ç±»å±æ¬¡ç»æå¾](md\7.png)
 
-在以下4种特殊情况下，finally块不会被执行：
-1.在finally语句块中发生了异常。
-2.在前面的代码中用了System.exit()退出程序。
-3.程序所在的线程死亡。
-4.关闭CPU。
-
 ## Io
 
 ```java
@@ -201,18 +179,6 @@ Java异常类层次结构图
         }
 ```
 
-### 什么是IO流？
-
-它是一种数据的流从源头流到目的地。比如文件拷贝，输入流和输出流都包括了。输入流从文件中读取数据存储到进程(process)中，输出流从进程中读取数据然后写入到目标文件。
-
-### 字节流和字符流的区别。
-
-字节流是以字节为单位写入写出；字符流是以字符为单位写入写出。
-
-### Java中流类的超类主要由那些？
-
-java.io.InputStream；java.io.OutputStream；java.io.Reader；java.io.Writer
-
 ### BufferedInputStream优势
 
 如果input用read()方法，每读取一次就要访问一次硬盘，这种读取的方式效率是很低的。
@@ -220,11 +186,7 @@ Buffered类初始化时会创建一个较大的byte数组，一次性从底层�
 
 ## IO多路复用实现
 
-IO多路复用的优势在于，当处理的消耗对比IO几乎可以忽略不计时，可以处理大量的并发IO，而不用消耗太多CPU/内存。
-
-IO多路复用 + 单进（线）程有个额外的好处，就不会有并发编程的各种坑问题，比如在nginx里，redis里，编程实现都会很简单很多。编程中处理并发冲突和一致性，原子性问题真的是很难，极易出错。如果做不到“处理过程相对于IO可以忽略不计”，IO多路复用的并不一定比线程池方案更好。
-
-比如一个web的服务，用jetty 9的NIO connector，后边是spring svc + JDBC连接数据库。spring svc + JDBC连接数据库这两块的处理延迟相对于NIO来说不能忽略，所以并不能指望用jetty 9的NIO connector换了之前的BIO connector的容器，性能能高不少
+socket.accept()、socket.read()、socket.write()三个主要函数都是同步阻塞的。使用IO多路复用便不需要开太多的线程因为上面操作原因而进入阻塞态，浪费内存资源，充分利用CPU和尽可能少开线程。
 
 #### select
 
@@ -248,17 +210,33 @@ IO多路复用 + 单进（线）程有个额外的好处，就不会有并发编
 
 ## JAVA  NIO
 
+```
+class IoThread extends Thread{
+   public void run(){
+   Channel channel;
+   while(channel=Selector.select()){//选择就绪的事件和对应的连接
+      if(channel.event==accept){
+         registerNewChannelHandler(channel);//如果是新连接，则注册一个新的读写处理器
+      }
+      if(channel.event==write){
+         getChannelHandler(channel).channelWritable(channel);//如果可以写，则执行写事件
+      }
+      if(channel.event==read){
+          getChannelHandler(channel).channelReadable(channel);//如果可以读，则执行读事件
+      }
+    }
+   }
+   Map<Channel，ChannelHandler> handlerMap;//所有channel的对应事件处理器
+  }
+```
+
+1. 事件分发器，单线程选择就绪的事件。 2. I/O处理器，包括connect、read、write等，这种纯CPU操作，一般开启CPU核心个线程就可以。 3. 业务线程，在处理完I/O后，业务一般还会有自己的业务逻辑，有的还会有其他的阻塞I/O，如DB操作，RPC等。只要有阻塞，就需要单独的线程。
+
 JAVA NIO 包含下面几个核心的组件：
 
 - Channel(通道)：通道是双向的，可读也可写
 - Buffer(缓冲区)：即ByteBuffer，在读取数据时，它是直接读到缓冲区中的; 在写入数据时，写入到缓冲区中。
 - Selector(选择器)：选择器用于使用单个线程处理多个通道。
-
-## Iterator和ListIterator的区别是什么？
-
-- Iterator可用来遍历Set和List集合，但是ListIterator只能用来遍历List。
-- Iterator对集合只能是前向遍历，ListIterator既可以前向也可以后向。
-- ListIterator实现了Iterator接口，并包含其他的功能，比如：增加元素，替换元素，获取前一个和后一个元素的索引，等等。
 
 # JAVA CONCURRENT
 
@@ -283,7 +261,7 @@ JAVA NIO 包含下面几个核心的组件：
 
 
 
-![](C:\Users\jimmiezeng\IdeaProjects\interview-review\md\100.png)
+![](md\100.png)
 
 当一个线程尝试获得锁时，如果该锁已经被占用，则会将该线程封装成一个ObjectWaiter对象插入到cxq的队列的队首，然后调用park函数挂起当前线程。在linux系统上，park函数底层调用的是gclib库的pthread_cond_wait，JDK的ReentrantLock底层也是用该方法挂起线程的。
 
