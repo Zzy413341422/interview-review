@@ -190,7 +190,7 @@ Read Repeatable隔离级别：**开启事务后第一个select语句才是快照
 
 ## next-key锁(行记录锁+Gap间隙锁)
 
-当InnoDB扫描索引记录的时候，会首先对索引记录加上行锁（Record Lock），再对索引记录两边的间隙加上间隙锁（Gap Lock）。
+Select * from  emp where empid > 100 for update;
 
 ## RR级别 幻读例子
 
