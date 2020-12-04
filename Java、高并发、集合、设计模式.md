@@ -210,6 +210,12 @@ socket.accept()、socket.read()、socket.write()三个主要函数都是同步�
 
 ## JAVA  NIO
 
+![](md\103.png)
+
+![](md\104.png)
+
+![](md\105.png)
+
 ```
 class IoThread extends Thread{
    public void run(){
@@ -609,11 +615,17 @@ put           添加一个元素，如果队列满，则自旋
 element  返回队列头部的元素，如果队列为空，则抛出一个异常
 peek        返回队列头部的元素，如果队列为空，则返回null
 
+## 压测需要关注的点
+
+CPU 内存 磁盘io 网络nestat jvm\FULL GC
+
 ## ThreadLocal及其引发的内存泄露
 
 ![ThreadLocalæ°æ®è¯»ååè®¾ç½®è¿ç¨](md\15.jpg)
 
 当释放掉对threadlocal对象的强引用后，map里面的value没有被回收，但却永远不会被访问到了，因此ThreadLocal存在着内存泄露问题。在不使用该ThreadLocal对象时，及时调用该对象的remove方法去移除ThreadLocal.ThreadLocalMap中的对应Entry。
+
+threadlocal是threadlocalmap的弱引用，会在gc后被回收。在每次调用ThreadLocal的get、set、remove方法时都会执行expungeStaleEntry，清除所有key为null的Entry。
 
 ThreadLocalMap 中解决 Hash 冲突的方式并非链表的方式，而是采用线性探测的方式。还有一种再散列方法；
 
