@@ -208,6 +208,37 @@ socket.accept()、socket.read()、socket.write()三个主要函数都是同步�
 
 红黑树在用户和内核的共享空间上。
 
+## JAVA BIO
+
+```
+{
+ ExecutorService executor = Excutors.newFixedThreadPollExecutor(100);//线程池
+
+ ServerSocket serverSocket = new ServerSocket();
+ serverSocket.bind(8088);
+ while(!Thread.currentThread.isInturrupted()){//主线程死循环等待新连接到来
+ Socket socket = serverSocket.accept();
+ executor.submit(new ConnectIOnHandler(socket));//为新的连接创建新的线程
+}
+
+class ConnectIOnHandler extends Thread{
+    private Socket socket;
+    public ConnectIOnHandler(Socket socket){
+       this.socket = socket;
+    }
+    public void run(){
+      while(!Thread.currentThread.isInturrupted()&&!socket.isClosed()){死循环处理读写事件
+          String someThing = socket.read()....//读取数据
+          if(someThing!=null){
+             ......//处理数据
+             socket.write()....//写数据
+          }
+
+      }
+    }
+}
+```
+
 ## JAVA  NIO
 
 ![](md\103.png)
