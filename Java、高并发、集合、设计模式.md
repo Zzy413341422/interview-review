@@ -186,7 +186,7 @@ Buffered类初始化时会创建一个较大的byte数组，一次性从底层�
 
 ## IO多路复用实现
 
-socket.accept()、socket.read()、socket.write()三个主要函数都是同步阻塞的。使用IO多路复用便不需要开太多的线程因为上面操作原因而进入阻塞态，浪费内存资源，充分利用CPU和尽可能少开线程。
+socket.accept()、socket.read()、socket.write()三个主要函数都是同步阻塞的。优点：比起多线程可以：1）减少上下文切换，提高性能。2）减少内存资源浪费 比起单线程：减少阻塞时间，提高CPU利用率，吞吐量
 
 #### select
 
