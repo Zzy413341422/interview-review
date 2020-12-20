@@ -155,11 +155,11 @@ MyISAM不支持外健，InnoDB支持。
 
 - 首先InnoDB每一行数据还有一个DB_ROLL_PT的回滚指针，用于指向该行修改前的上一个历史版本  
 
-![img](md/30.jpeg)
+![img](md/30.png)
 
  当插入的是一条新数据时，记录上对应的回滚段指针为NULL
 
-![img](md/31.jpeg)
+![img](md/31.png)
 
  更新记录时，原记录将被放入到undo表空间中，并通过DB_ROLL_PT指向该记录。session2查询返回的未修改数据就是从这个undo中返回的。MySQL就是根据记录上的回滚段指针及事务ID判断记录是否可见，如果不可见继续按照DB_ROLL_PT继续回溯查找。
 
@@ -198,7 +198,7 @@ Mysql官方给出的幻读解释是：只要在一个事务中，第二次select
 
 ## 数据库锁
 
-![img](md\32.jpg)
+![img](md\32.png)
 
 ![img](md\33.png)
 
@@ -283,7 +283,15 @@ SELECT id,title,content **FROM** items **WHERE** id IN (**SELECT** id **FROM** i
 
 单节点转化为集群架构，提升数据库的并发读写性能。
 
-主从复制原理：主库将变更写入 binlog 日志，然后从库连接到主库之后，从库有一个 IO 线程，将主库的 binlog 日志拷贝到自己本地，写入一个 relay 中继日志中。接着从库中有一个 SQL 线程会从中继日志读取 binlog，然后执行 binlog 日志中的内容，也就是在自己本地再次执行一遍 SQL，这样就可以保证自己跟主库的数据是一样的。
+主从复制原理：MySQL master 将数据变更写入二进制日志( binary log, 其中记录叫做二进制日志事件binary log events，可以通过 show binlog events 进行查看)
+MySQL slave 将 master 的 binary log events 拷贝到它的中继日志(relay log)
+MySQL slave 重放 relay log 中事件，将数据变更反映它自己的数据
+
+## canal 工作原理
+
+canal 模拟 MySQL slave 的交互协议，伪装自己为 MySQL slave ，向 MySQL master 发送dump 协议
+MySQL master 收到 dump 请求，开始推送 binary log 给 slave (即 canal )
+canal 解析 binary log 对象(原始为 byte 流)
 
 ## 分库分表后的缺点
 
@@ -637,7 +645,7 @@ Redi检查内存使用情况，如果大于maxmemory的限制, 则根据设定�
 
 双缓存机制：设置一级缓存和二级缓存，一级缓存过期时间短，二级缓存过期时间长或者不过期，一级缓存失效后访问二级缓存，同时刷新一级缓存和二级缓存。
 
-![img](md\34.webp)
+![img](md\34.png)
 
 ## 缓存一致性
 
@@ -695,11 +703,64 @@ zincrby list score A;
 Redis Sentinal着眼于高可用，在master宕机时会自动将slave提升为master，继续提供服务。
 Redis Cluster着眼于扩展性，在单个redis内存不足时，使用Cluster进行分片存储。
 
-## ES
+# ES
+
+## 倒排索引
+
+![](md\121.png)
 
 ![](md\96.png)
 
-![](md\95.jpg)
+## 交集算法
 
-### 为什么倒排索引快
+### 交集算法一之skiplist
 
+### 交集算法二之bitset
+
+算法思想基于bitmap(布隆过滤器结构)的简化实现
+posting list为[1,3,4,7,10]， 则bitset为[1,0,1,1,0,0,1,0,0,1]，一共十个，1表示有数，0表示数据不存在。1byte就能表示八个数据，能节省空间。
+三个posting list的bitset可以做and操作就能挑出交集。
+
+## 查询流程
+
+1）客户端发送请求到一个coordinate node
+
+2）协调节点将搜索请求转发到所有的shard对应的primary shard或replica shard也可以
+
+3）query phase：每个shard将自己的搜索结果（其实就是一些doc id），返回给协调节点，由协调节点进行数据的合并、排序、分页等操作，产出最终结果
+
+4）fetch phase：接着由协调节点，根据doc id去各个节点上拉取实际的document数据，最终返回给客户端
+
+## 写入流程
+
+![](md\122.png)
+
+#### 分段（Segment）
+
+每个分片包含多个 segment（段），每一个 segment 都是一个倒排索引。在查询的时，会把所有的 segment 查询结果汇总归并后最为最终的分片查询结果返回。
+
+#### commit point
+
+记录当前所有可用的 segment，每个 commit point 都会维护一个.del 文件（ES 删除数据本质是不属于物理删除），当 ES 做删改操作时首先会在 `.del` 文件中声明某个 document 已经被删除，文件内记录了在某个 segment 内某个文档已经被删除，当查询请求过来时在 segment 中被删除的文件是能够查出来的，但是当返回结果时会根据 commit point 维护的那个 .del 文件把已经删除的文档过滤掉。
+
+#### translog 日志文件
+
+假如在写入数据的时候，ES 节点突然宕机，因为数据是先写入缓存中，所以可能会造成数据丢失的情况。为了保证数据存储的可靠性，ES 在写入缓存后，再写入 translog 日志文件，因为有可能缓存写入失败，为了减少写入失败回滚的复杂度，因此先写入缓存。由于 translog 是追加写入，因此性能要比随机写入要好。
+
+#### refresh
+
+ES 默认每隔 1 秒会从内存 buffer 中的数据写入 `filesystem cache`，这个过程叫做 refresh。这也是为什么说 ES 是近实时搜索的原因，因为数据写入到 filesystem cache 后才会被搜索到。
+
+#### merge 操作
+
+refresh 的过程会产生大量的小 segment，因此 ES 会有专门的任务检测当前磁盘中的 segment，对符合条件的 segment 进行合并操作，减少 lucene 中的 segment 个数，提高查询速度。不仅如此，merge 过程也是文档删除和更新操作后，旧的 doc 真正被删除的时候。用户还可以手动调用 `_forcemerge API` 来主动触发 merge，以减少集群的 segment 个数和清理已删除或更新的文档。
+
+#### flush
+
+每 30 分钟或当 translog 达到一定大小(由`index.translog.flush_threshold_size`控制，默认 `512 mb` )，ES 会触发一次 flush 操作，此时 ES 会先执行 refresh 操作将 buffer 中的数据生成 segment，然后调用 lucene 的 commit 方法将所有内存中的 segment fsync 到磁盘。此时 lucene 中的数据就完成了持久化，会清空 translog 中的数据
+
+### 总结
+
+1. Elasticsearch 任意节点都可以作为协调节点，当接收到请求的的时候，会根据 `_routing`路由规则找到对应的主分片节点
+2. memory buffer 到 filesystem cache 之间的 refresh 操作是 Elasticsearch 近实时查询的原因。
+3. 通过引入 translog，定期的 flush、merge 保证了数据的可靠性和高效的存储性能

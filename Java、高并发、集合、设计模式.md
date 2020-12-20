@@ -121,11 +121,11 @@ String可变相当于废了缓存池，影响速度。并且也有String中也�
 
 1、浅拷贝：对基本数据类型进行值传递，对引用数据类型进行引用传递般的拷贝，此为浅拷贝。
 
-![/clone-qian.png](md\5.jpg)
+![/clone-qian.png](md\5.png)
 
 2、深拷贝：对基本数据类型进行值传递，对引用数据类型，创建一个新的对象，并复制其内容，此为深拷贝。
 
-![/clone-深.png](md\6.jpg)
+![/clone-深.png](md\6.png)
 
 ## 自动装箱与拆箱
 
@@ -306,7 +306,7 @@ JAVA NIO 包含下面几个核心的组件：
 
 如果线程获得锁后调用Object#wait方法，则会将线程加入到WaitSet中，当被Object#notify唤醒后，会将线程从WaitSet移动到cxq或EntryList中去。需要注意的是，当调用一个锁对象的wait或notify方法时，如当前锁的状态是偏向锁或轻量级锁则会先膨胀成重量级锁。
 
-![img](md\86.jpg)
+![img](md\86.png)
 
 
 
@@ -346,7 +346,7 @@ JAVA NIO 包含下面几个核心的组件：
 
 #### 锁粗化
 
-![img](md\9.jpg)
+![img](md\9.png)
 
 类似上图中的append方法，如果虚拟机探测到有一串零碎操作都是对同一对象加锁，将会把加锁同步的范围扩展到整个操作序列的外部，也就是在第一个和最后一个append操作之后。
 
@@ -466,7 +466,7 @@ RejectedExecutionHandler类型的变量，表示线程池的饱和策略。
 
 #### 线程池执行过程：
 
- ![è¿éåå¾çæè¿°](https://img-blog.csdn.net/20170618213838961?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvdTAxMTI0MDg3Nw==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
+ ![è¿éåå¾çæè¿°](md/12.png)
 
 #### 线程池调优:
 
@@ -580,7 +580,7 @@ CyclicBarrier(循环栅栏)： 让一组线程到达一个屏障时被阻塞，�
 
 ## 线程
 
-![img](md\14.jpg)
+![img](md\14.png)
 
 #### 实现线程的3种方法：
 
@@ -650,7 +650,7 @@ CPU 内存 磁盘io 网络nestat jvm\FULL GC
 
 ## ThreadLocal及其引发的内存泄露
 
-![ThreadLocalæ°æ®è¯»ååè®¾ç½®è¿ç¨](md\15.jpg)
+![ThreadLocalæ°æ®è¯»ååè®¾ç½®è¿ç¨](md\15.png)
 
 当释放掉对threadlocal对象的强引用后，map里面的value没有被回收，但却永远不会被访问到了，因此ThreadLocal存在着内存泄露问题。在不使用该ThreadLocal对象时，及时调用该对象的remove方法去移除ThreadLocal.ThreadLocalMap中的对应Entry。
 
@@ -662,7 +662,7 @@ ThreadLocalMap 中解决 Hash 冲突的方式并非链表的方式，而是采�
 
 # 集合类
 
-![img](md\16.jpg)
+![img](md\16.png)
 
 ## HashMap
 

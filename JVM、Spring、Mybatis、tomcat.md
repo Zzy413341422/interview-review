@@ -2,7 +2,7 @@
 
 ## 介绍下Java内存区域
 
-![img](md\19.jpg)
+![img](md\19.png)
 
 - Java堆：占据了虚拟机管理内存中最大的一块，唯一目的就是存放对象实例，也是垃圾回收器主要管理的地方 
 
@@ -96,7 +96,7 @@ java线程要停止才能彻底清除干净，否则会影响gc线程的处理�
 
 3.相同年龄的对象占了survivor空间的一半
 
-![img](md\24.jpg)
+![img](md\24.png)
 
 ## 并行和并发：
 
@@ -107,7 +107,7 @@ java线程要停止才能彻底清除干净，否则会影响gc线程的处理�
 
 ## 介绍一下收集器。
 
-![img](md\23.jpg)
+![img](md\23.png)
 
 •  Serial收集器（复制算法): 新生代单线程收集器，标记和清理都是单线程，优点是简单高效； 
 •  Serial Old收集器 (标记-整理算法): 老年代单线程收集器，Serial收集器的老年代版本； 
@@ -131,7 +131,7 @@ jdk8默认Parallel Scavenge + Serial Old jdk9默认g1
 
 并发清除（CMS concurrent sweep）
 
-![img](md\80.jpg)
+![img](md\80.png)
 
 缺点：标记-清除算法导致的空间碎片，可以配置n次Full GC后压缩空间
 
@@ -149,7 +149,7 @@ jdk8默认Parallel Scavenge + Serial Old jdk9默认g1
 
 筛选回收（Live Data Counting and Evacuation） 首先对各个Region中的回收价值和成本进行排序，根据用户所期望的GC 停顿是时间来制定回收计划。此阶段其实也可以做到与用户程序一起并发执行，但是因为只回收一部分Region，时间是用户可控制的，而且停顿用户线程将大幅度提高收集效率。
 
-![img](md\81.jpg)
+![img](md\81.png)
 
 优点 ：横跨整个堆内存（将整个Java堆划分为多个大小相等的独立区域（Region），虽然还保留新生代和老年代的概念，但新生代和老年代不再是物理隔离的了，而都是一部分Region（不需要连续）的集合。）
 
@@ -188,7 +188,7 @@ Full GC：
 
 ## 简单说说类加载过程，里面执行了哪些操作？
 
-![ç±»å è½½è¿ç¨-11.2kB](md\25.jpg)
+![ç±»å è½½è¿ç¨-11.2kB](md\25.png)
 
 在使用前加载到JVM
 
@@ -393,7 +393,7 @@ d.注解注入：基于反射原理
 
 #### spring是如何解决循环依赖：
 
-![](md\87.jpg)
+![](md\87.png)
 
     protected Object getSingleton(String beanName, boolean allowEarlyReference) {
         // 1. 尝试去一级缓存中加载我们的bean，IOC容器初始化加载单例bean的时候，第一次进来都会返回null，一级缓存保存的已经处理完成的对象
@@ -540,13 +540,13 @@ public class AnalysisActuatorAspect {
 
 #### MVC框架
 
-![img](md\37.jpg)
+![img](md\37.png)
 
 #### 什么是Spring的MVC框架？
 
 Spring 配备构建Web 应用的全功能MVC框架。Spring可以很便捷地和其他MVC框架集成，如Struts，Spring 的MVC框架用控制反转把业务对象和控制逻辑清晰地隔离。它也允许以声明的方式把请求参数和业务对象绑定。
 
-![SpringMVCè¿è¡åç](md\38.jpg)
+![SpringMVCè¿è¡åç](md\38.png)
 
 #### Spring和SpringMVC的关系
 
@@ -617,7 +617,7 @@ Spring Boot启动扫描所有jar包的META-INF/spring.factories中配置的 Enab
 - 第二部分实现了应用具体的启动方案，包括启动流程的监听模块、加载配置环境模块、及核心的创建上下文环境模块；
 - 第三部分是自动化配置模块，该模块作为springboot自动配置核心，在后面的分析中会详细讨论。在下面的启动程序中我们会串联起结构中的主要功能。
 
-![SpringBoot 应用启动流程图](md\39.jpg)
+![SpringBoot 应用启动流程图](md\39.png)
 
 # Tomcat
 
