@@ -10,11 +10,19 @@
 
 ## 如何保证不丢数据
 
-双1模式
+innodb_flush_log_at_trx_commit（刷盘redo log）：
 
-也就是说每次事务提交的时候，一次写log buffer，一次刷盘（写入redo log）
+0：每秒write cache和flush disk
 
-在提交事务之前，允许将binlog同步到磁盘。
+1：每次commit都 write cache和flush disk
+
+2：每次commit都 write cache
+
+sync_binlog（刷盘bin log）：
+
+sync_binlog = 0 （mysql默认值 ）由文件系统决定将binlog同步到硬盘。
+sync_binlog = 1 每提交一次事务，写一次binlog，并使用fsync()同步到硬盘。
+sync_binlog > 1 每提交一次事务，写一次binlog，达到sync_binlog 设定的值后，调用fsync()同步到硬盘。
 
 ## 日志区别
 
@@ -293,6 +301,24 @@ canal 模拟 MySQL slave 的交互协议，伪装自己为 MySQL slave ，向 My
 MySQL master 收到 dump 请求，开始推送 binary log 给 slave (即 canal )
 canal 解析 binary log 对象(原始为 byte 流)
 
+## SnowFlake算法
+
+SnowFlake算法：
+
+![](md\129.png)
+
+缺点：
+
+强依赖机器时钟，如果机器上时钟回拨，会导致发号重复或者服务会处于不可用状态。
+
+Leaf-SnowFlake算法：
+
+1）if写过：与zk上对应写入的节点进行时间比如，若小于，则认为机器时间发生了大步长回拨，服务启动失败并报警。 else到2
+
+2）通过RPC请求得到所有节点的系统时间，计算sum(time)/nodeSize。若abs( 系统时间-sum(time)/nodeSize ) < 阈值，认为当前系统时间准确，正常启动服务。
+
+3）每隔一段时间(3s)上报自身系统时间写入leaf_forever/${self}。
+
 ## 分库分表后的缺点
 
 1、引入聚合函数的二次汇总
@@ -399,34 +425,16 @@ Redis 的多线程部分只是用来处理网络数据的读写和协议解析�
 
 > 当string对象的值全部是数字，就会使用int编码。
 
-```
-127.0.0.1:6379> set number 123455
-OK
-127.0.0.1:6379> object encoding number
-"int"
-```
 
 ##### 3.1.2 embstr
 
 > 字符串或浮点数长度小于等于39字节，就会使用embstr编码方式来存储，embstr存储内存一般很小，所以redis一次性分配且内存连续(效率高)。
 
-```
-127.0.0.1:6379> set shortStr "suwe suwe suwe"
-OK
-127.0.0.1:6379> object encoding shortStr
-"embstr"
-```
 
 ##### 3.1.2 raw
 
 > 当一个字符串或浮点数长度大于39字节，就使用SDS来保存，编码为raw，由于不确定值的字节大小，所以键和值各分配各的，所以就分配两次内存(回收也是两次)，同理它一定不是内存连续的。
 
-```
-127.0.0.1:6379> set longStr "hello everyone, we dont need to sleep around to go aheard! do you think?"
-OK
-127.0.0.1:6379> object encoding longStr
-"raw"
-```
 
 ##### 3.1.3 编码转换
 
@@ -436,27 +444,11 @@ int->raw
 
 > 条件：数字对象进行append字母，就会发生转换。
 
-```
-127.0.0.1:6379> object encoding number
-"int"
-127.0.0.1:6379> append number " is a lucky number"
-(integer) 24
-127.0.0.1:6379> object encoding number
-"raw"
-```
 
 embstr->raw
 
 > 条件：对embstr进行修改，redis会先将其转换成raw，然后才进行修改。所以embstr实际上是只读性质的。
 
-```
-127.0.0.1:6379> object encoding shortStr
-"embstr"
-127.0.0.1:6379> append shortStr "(hhh"
-(integer) 18
-127.0.0.1:6379> object encoding shortStr
-"raw"
-```
 
 #### 3.2 列表(list)
 
@@ -477,7 +469,7 @@ ziplist->linkedlist
 
 > 哈希对象的编码有:ziplist和hashtable
 
-##### 3.3.1 编码转换
+##### 3.3.1 编码转换 
 
 ziplist->hashtable
 
