@@ -688,18 +688,9 @@ resize 就是自动扩容，当当前数据存储的数量（即size()）大小�
 #### HashMap什么时候扩容
 
 1.8扩容会发生在两种情况下（满足任意一种条件即发生扩容）：
-　　　　　　a 当前存入数据数量大于阈值即发生扩容
+　　　　　　a 当前存入数据数量大于阈值即发生扩容（1.8无需哈希碰撞）
 　　　　　　b 存入数据到某一条链表上，此时数据大于8，且数组长度小于64即发生扩容
-1.7 a存放新值的时候当前已有元素的个数必须大于等于阈值
-b存放新值的时候当前存放数据发生hash碰撞（当前key计算的hash值换算出来的数组下标位置已经存在值）
-
-## HashMap 和 Hashtable 的区别
-
-线程是否安全： HashMap 是非线程安全的，HashTable 是线程安全的；HashTable 内部的方法基本都经过 synchronized 修饰。
-效率： 因为线程安全的问题，HashMap 要比 HashTable 效率高一点。另外，HashTable 基本被淘汰，不要在代码中使用它；
-对Null key 和Null value的支持： HashMap 中，null 可以作为键，这样的键只有一个，可以有一个或多个键所对应的值为 null。。但是在 HashTable 中 put 进的键值只要有一个 null，直接抛出 NullPointerException。
-初始容量大小和每次扩充容量大小的不同 ： ①创建时如果不指定容量初始值，Hashtable 默认的初始大小为11，之后每次扩充，容量变为原来的2n+1。HashMap 默认的初始化大小为16。之后每次扩充，容量变为原来的2倍。②创建时如果给定了容量初始值，那么 Hashtable 会直接使用你给定的大小，而 HashMap 会将其扩充为2的幂次方大小
-底层数据结构： JDK1.8 以后的 HashMap 在解决哈希冲突时有了较大的变化，当链表长度大于阈值（默认为8）时，将链表转化为红黑树，以减少搜索时间。Hashtable 没有这样的机制。
+1.7 存放新值的时候当前已有元素的个数必须大于等于阈值&&存放新值的时候当前存放数据发生hash碰撞（当前key计算的hash值换算出来的数组下标位置已经存在值）
 
 ## HashMap 的长度为什么是2的幂次方
 
@@ -749,23 +740,14 @@ JDK1.7
 
 对象锁，方法都要获取一个变量mutex的锁
 
-## LinkedHashmap实现Lru
+## HashMap 和 Hashtable 的区别
 
-```java
-public class LRUCache {
-    private int capacity;
-    private Map<Integer, Integer> cache;
-    public LRUCache(int capacity) {
-        this.capacity = capacity;
-        this.cache = new LinkedHashMap<Integer, Integer> (capacity, 0.75f, true) {
-            // 定义put后的移除规则，大于容量就删除eldest
-            protected boolean removeEldestEntry(Map.Entry<Integer, Integer> eldest) {
-                return size() > capacity;
-            }
-        };
-    }
- }
-```
+线程是否安全： HashMap 是非线程安全的，HashTable 是线程安全的；HashTable 内部的方法基本都经过 synchronized 修饰。
+效率： 因为线程安全的问题，HashMap 要比 HashTable 效率高一点。另外，HashTable 基本被淘汰，不要在代码中使用它；
+对Null key 和Null value的支持： HashMap 中，null 可以作为键，这样的键只有一个，可以有一个或多个键所对应的值为 null。。但是在 HashTable 中 put 进的键值只要有一个 null，直接抛出 NullPointerException。
+初始容量大小和每次扩充容量大小的不同 ： ①创建时如果不指定容量初始值，Hashtable 默认的初始大小为11，之后每次扩充，容量变为原来的2n+1。HashMap 默认的初始化大小为16。之后每次扩充，容量变为原来的2倍。②创建时如果给定了容量初始值，那么 Hashtable 会直接使用你给定的大小，而 HashMap 会将其扩充为2的幂次方大小
+底层数据结构： JDK1.8 以后的 HashMap 在解决哈希冲突时有了较大的变化，当链表长度大于阈值（默认为8）时，将链表转化为红黑树，以减少搜索时间。Hashtable 没有这样的机制/。
+
 
 ## ArrayLisy
 
@@ -775,13 +757,9 @@ public class LRUCache {
 
 在JDK1.7中，如果通过无参构造的话，初始数组容量为0，当真正对数组进行添加时，才真正分配容量。
 每次按照1.5倍（位运算）的比率通过copeOf的方式扩容。 
-在JKD1.6中，如果通过无参构造的话，初始数组容量为10.每次通过copeOf的方式扩容后容量为原来的1.5倍加1.以上就是动态扩容的原理。
+在JKD1.6中，如果通过无参构造的话，初始数组容量为10.每次通过copeOf的方式扩容后容量为原来的1.5倍
 
 数据量大的优化措施：向 ArrayList 添加大量元素之前最好先使用`ensureCapacity` 方法，以减少增量重新分配的次数
-
-## CopyOnWriteArrayList
-
-CopyOnWriteArrayList 类的所有可变操作（add，set等等）都是通过创建底层数组的新副本来实现的。当 List 需要被修改的时候，我并不修改原有内容，而是对原有数据进行一次复制，将修改的内容写入副本。写完之后，再将修改完的副本替换原来的数据，这样就可以保证写操作不会影响读操作了。
 
 ## LinkedList
 
@@ -805,6 +783,9 @@ LinkedList 底层使用的是双向链表数据结构（JDK1.6之前为循环链
 
    实现了RandomAccess接口的list，优先选择普通for循环 
    未实现RandomAccess接口的list，foreach遍历
+## CopyOnWriteArrayList
+
+CopyOnWriteArrayList 类的所有可变操作（add，set等等）都是通过创建底层数组的新副本来实现的。当 List 需要被修改的时候，我并不修改原有内容，而是对原有数据进行一次复制，将修改的内容写入副本。写完之后，再将修改完的副本替换原来的数据，这样就可以保证写操作不会影响读操作了。       
 
 # 设计模式
 
