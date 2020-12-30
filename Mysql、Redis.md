@@ -208,24 +208,17 @@ Mysql官方给出的幻读解释是：只要在一个事务中，第二次select
 
 ![img](md\32.png)
 
+![img](md\134.png)
+
 ![img](md\33.png)
 
-- 对于`UPDATE、DELETE、INSERT`语句，**InnoDB**会**自动**给涉及数据集加排他锁（X)
+意向锁是表级锁,只与表锁有冲突,不与行锁有冲突：
 
-  **MyISAM**在执行查询语句`SELECT`前，会**自动**给涉及的所有表加**读锁**，在执行更新操作（`UPDATE、DELETE、INSERT`等）前，会**自动**给涉及的表加**写锁**，这个过程并**不需要用户干预**
+意向共享锁(IS) : 在加行级读锁(S锁)前会先加意向共享锁(IS)后再加行级读锁.
+意向排他锁(IX) : 在加行级写锁(X锁)前会先加意向排他锁(IX)后再加行级写锁.
 
-- 共享锁（S）：`SELECT * FROM table_name WHERE ... LOCK IN SHARE MODE`。
+## 四种锁
 
-- 排他锁（X）：`SELECT * FROM table_name WHERE ... FOR UPDATE`。
-
-- 间隙锁  :SELECT c FROM t WHERE c BETWEEN 10 and 20 FOR UPDATE;
-
-允许多个线程同时对想读的内容加锁,即共享锁或叫S锁),写的时候不*能*读
-
-InnoDB实现的`Repeatable read`隔离级别配合GAP间隙锁已经避免了幻读！
-
-- 乐观锁其实是一种思想，正如其名：认为不会锁定的情况下去更新数据，如果发现不对劲，才不更新(回滚)。在数据库中往往添加一个version字段来实现。
-- 悲观锁用的就是数据库的行锁，认为数据库会发生并发冲突，直接上来就把数据锁住，其他事务不能修改，直至提交了当前事务
 
 ## 外连接
 
