@@ -2,7 +2,7 @@
 
 ## 机器码和字节码区别111
 
-![1](md\1.png)
+![1](./image/1.png)
 
 ## 面向对象和面向过程的区别
 
@@ -32,7 +32,7 @@
 
 ## 8种基本数据类型
 
-![3](md\3.png)
+![3](./image/3.png)
 
 Character,    Byte，Short，Long 的缓存池范围默认都是: -128 到 127。
 
@@ -93,7 +93,7 @@ equal		hashCode		wait		notify		notifyAll		toString		clone		getClass		finalize
 
 ## 访问修饰符
 
-![img](md\4.png)
+![img](./image/4.png)
 
 ## String 和 StringBuffer、StringBuiler
 
@@ -121,11 +121,11 @@ String可变相当于废了缓存池，影响速度。并且也有String中也�
 
 1、浅拷贝：对基本数据类型进行值传递，对引用数据类型进行引用传递般的拷贝，此为浅拷贝。
 
-![/clone-qian.png](md\5.png)
+![/clone-qian.png](./image/5.png)
 
 2、深拷贝：对基本数据类型进行值传递，对引用数据类型，创建一个新的对象，并复制其内容，此为深拷贝。
 
-![/clone-深.png](md\6.png)
+![/clone-深.png](./image/6.png)
 
 ## 自动装箱与拆箱
 
@@ -159,7 +159,7 @@ String可变相当于废了缓存池，影响速度。并且也有String中也�
 
 Java异常类层次结构图
 
-![Javaå¼å¸¸ç±»å±æ¬¡ç»æå¾](md\7.png)
+![Javaå¼å¸¸ç±»å±æ¬¡ç»æå¾](./image/7.png)
 
 ## Io
 
@@ -217,11 +217,11 @@ class ConnectIOnHandler extends Thread{
 
 ## JAVA  NIO
 
-![](md\103.png)
+![](./image/103.png)
 
-![](md\104.png)
+![](./image/104.png)
 
-![](md\105.png)
+![](./image/105.png)
 
 ```
 class IoThread extends Thread{
@@ -273,9 +273,9 @@ synchronized实际上有两个队列waitSet和entryList。
 3. 如果线程调用wait方法，将释放锁，当前线程置为null，计数器-1，同时进入waitSet等待被唤醒，调用notify或者notifyAll之后又会进入entryList竞争锁
 4. 如果线程执行完毕，同样释放锁，计数器-1，当前线程置为null
 
-![](md\100.png)
+![](./image/100.png)
 
-![img](md\86.png)
+![img](./image/86.png)
 
 
 
@@ -307,7 +307,7 @@ synchronized实际上有两个队列waitSet和entryList。
 
 重量级锁是指当锁为轻量级锁的时候，另一个线程虽然是自旋，但自旋不会一直持续下去，当自旋一定次数的时候，还没有获取到锁，就会进jianb入阻塞，该锁膨胀为重量级锁。重量级锁会让其他申请的线程进入阻塞，性能降低。
 
-![](md\127.png)
+![](./image/127.png)
 
 #### 锁消除
 
@@ -315,7 +315,7 @@ synchronized实际上有两个队列waitSet和entryList。
 
 #### 锁粗化
 
-![img](md\9.png)
+![img](./image/9.png)
 
 类似上图中的append方法，如果虚拟机探测到有一串零碎操作都是对同一对象加锁，将会把加锁同步的范围扩展到整个操作序列的外部，也就是在第一个和最后一个append操作之后。
 
@@ -348,7 +348,7 @@ LOCK前缀：CPU保证被其修饰的指令的原子性。
 
 ## 谈谈 synchronized和ReenTrantLock 的区别
 
-![](md\92.png)
+![](./image/92.png)
 
 ## Volatile:
 
@@ -539,7 +539,7 @@ AtomicInteger 类主要利用 CAS (compare and swap) + volatile 和 native 方�
 
 AQS是一种提供了原子式管理同步状态、阻塞和唤醒线程功能以及队列模型的简单框架。如果被请求的共享资源空闲，则将当前请求资源的线程设置为有效的工作线程，并且将共享资源设置为锁定状态。如果被请求的共享资源被占用，那么就需要一套线程阻塞等待以及被唤醒时锁分配的机制，这个机制AQS是用CLH队列锁实现的，即将暂时获取不到锁的线程加入到队列中。 
 
-![AQSåçå¾](md\13.png)
+![AQSåçå¾](./image/13.png)
 
 #### AQS阻塞等待以及被唤醒时锁分配的机制
 
@@ -566,7 +566,7 @@ CyclicBarrier(循环栅栏)： 让一组线程到达一个屏障时被阻塞，�
 
 ## 线程
 
-![img](md\14.png)
+![img](./image/14.png)
 
 #### 实现线程的3种方法：
 
@@ -618,7 +618,7 @@ CPU 内存 磁盘io 网络nestat jvm\FULL GC
 
 ## ThreadLocal及其引发的内存泄露
 
-![ThreadLocalæ°æ®è¯»ååè®¾ç½®è¿ç¨](md\15.png)
+![ThreadLocalæ°æ®è¯»ååè®¾ç½®è¿ç¨](./image/15.png)
 
 当释放掉对threadlocal对象的强引用后，map里面的value没有被回收，但却永远不会被访问到了，因此ThreadLocal存在着内存泄露问题。在不使用该ThreadLocal对象时，及时调用该对象的remove方法去移除ThreadLocal.ThreadLocalMap中的对应Entry。
 
@@ -630,7 +630,7 @@ ThreadLocalMap 中解决 Hash 冲突的方式并非链表的方式，而是采�
 
 # 集合类
 
-![img](md\16.png)
+![img](./image/16.png)
 
 ## HashMap
 
@@ -650,7 +650,7 @@ loadFactor太大导致查找元素效率低，太小导致数组的利用率低
 
 #### put方法
 
-![putæ¹æ³](md\17.png)
+![putæ¹æ³](./image/17.png)
 
 #### HashMap的线程不安全主要体现在下面两个方面：
 

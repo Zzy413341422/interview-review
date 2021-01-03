@@ -51,7 +51,7 @@ GC Roots：
 
 ## 判断对象死亡后，如何避免GC
 
-![img](md\22.png)
+![img](./image/22.png)
 
 ## Stop-The-World原因
 
@@ -88,7 +88,7 @@ java线程要停止才能彻底清除干净，否则会影响gc线程的处理�
 
 ## 介绍一下收集器。
 
-![img](md\23.png)
+![img](./image/23.png)
 
 •  Serial收集器（复制算法): 新生代单线程收集器，标记和清理都是单线程，优点是简单高效； 
 •  Serial Old收集器 (标记-整理算法): 老年代单线程收集器，Serial收集器的老年代版本； 
@@ -104,11 +104,11 @@ jdk8默认Parallel Scavenge + Serial Old jdk9默认g1
 
 #### Serial单线程垃圾回收器
 
-![img](md\126.png)
+![img](./image/126.png)
 
 #### Parallel 并行收集器
 
-![img](md\125.png)
+![img](./image/125.png)
 
 #### CMS收集器
 
@@ -120,7 +120,7 @@ jdk8默认Parallel Scavenge + Serial Old jdk9默认g1
 
 并发清除（CMS concurrent sweep）
 
-![img](md\80.png)
+![img](./image/80.png)
 
 缺点：标记-清除算法导致的空间碎片，可以配置n次Full GC后压缩空间
 
@@ -138,7 +138,7 @@ jdk8默认Parallel Scavenge + Serial Old jdk9默认g1
 
 筛选回收（Live Data Counting and Evacuation） 首先对各个Region中的回收价值和成本进行排序，根据用户所期望的GC 停顿是时间来制定回收计划。此阶段其实也可以做到与用户程序一起并发执行，但是因为只回收一部分Region，时间是用户可控制的，而且停顿用户线程将大幅度提高收集效率。
 
-![img](md\81.png)
+![img](./image/81.png)
 
 （1）并行与并发：能充分利用多CPU，多核环境下的硬件优势。
 
@@ -183,7 +183,7 @@ Full GC：
 
 ## 简单说说类加载过程，里面执行了哪些操作？
 
-![ç±»å è½½è¿ç¨-11.2kB](md\25.png)
+![ç±»å è½½è¿ç¨-11.2kB](./image/25.png)
 
 在使用前加载到JVM
 
@@ -212,7 +212,7 @@ Full GC：
 
 ## 对类加载器有了解吗？什么是双亲委派模型？
 
-![ClassLoader](md\26.png)
+![ClassLoader](./image/26.png)
 
 ## 不同的类加载器在方法区有对应相对隔离的空间
 
@@ -400,7 +400,7 @@ d.注解注入：基于反射原理
 
 #### spring是如何解决循环依赖：
 
-![](md\87.png)
+![](./image/87.png)
 
     protected Object getSingleton(String beanName, boolean allowEarlyReference) {
         // 1. 尝试去一级缓存中加载我们的bean，IOC容器初始化加载单例bean的时候，第一次进来都会返回null，一级缓存保存的已经处理完成的对象
@@ -444,7 +444,7 @@ Spring框架支持以下五种bean的作用域：
 
 #### 解释Spring框架中bean的生命周期
 
-![beanå®ä¾åè¿ç¨](md\76.png)
+![beanå®ä¾åè¿ç¨](./image/76.png)
 
 #### spring容器的初始化过程：
 
@@ -472,7 +472,7 @@ AOP核心就是切面，它将多个类的通用行为封装成可重用的模�
 
 切入点是一个或一组连接点，通知将在这些位置执行。可以通过表达式或匹配的方式指明切入点。
 
-![è¿éåå¾çæè¿°](md\36.png)
+![è¿éåå¾çæè¿°](./image/36.png)
 
 #### jdk动态代理和cglib动态代理区别：
 
@@ -547,13 +547,13 @@ public class AnalysisActuatorAspect {
 
 #### MVC框架
 
-![img](md\37.png)
+![img](./image/37.png)
 
 #### 什么是Spring的MVC框架？
 
 Spring 配备构建Web 应用的全功能MVC框架。Spring可以很便捷地和其他MVC框架集成，如Struts，Spring 的MVC框架用控制反转把业务对象和控制逻辑清晰地隔离。它也允许以声明的方式把请求参数和业务对象绑定。
 
-![SpringMVCè¿è¡åç](md\38.png)
+![SpringMVCè¿è¡åç](./image/38.png)
 
 #### Spring和SpringMVC的关系
 
@@ -624,7 +624,7 @@ Spring Boot启动扫描所有jar包的META-INF/spring.factories中配置的 Enab
 - 第二部分实现了应用具体的启动方案，包括启动流程的监听模块、加载配置环境模块、及核心的创建上下文环境模块；
 - 第三部分是自动化配置模块，该模块作为springboot自动配置核心，在后面的分析中会详细讨论。在下面的启动程序中我们会串联起结构中的主要功能。
 
-![SpringBoot 应用启动流程图](md\39.png)
+![SpringBoot 应用启动流程图](./image/39.png)
 
 # Tomcat
 

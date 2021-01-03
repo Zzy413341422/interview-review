@@ -2,65 +2,21 @@
 
 ## Mysql基本架构
 
-![img](md\102.png)
+![img](./image/102.png)
 
 第一层：服务层(为客户端服务):为请求做连接处理，授权认证，安全等。
 第二层：Mysql核心服务层：主要提供，查询解析、分析、优化、缓存以及内置函数，跨存储引擎功能（存储过程、视图、触发器）
 第三层：存储引擎层，负责数据的存储和提取
 
-## 如何保证不丢数据
-
-innodb_flush_log_at_trx_commit（刷盘redo log）：
-
-0：每秒write cache和flush disk
-
-1：每次commit都 write cache和flush disk
-
-2：每次commit都 write cache
-
-sync_binlog（刷盘bin log）：
-
-sync_binlog = 0 （mysql默认值 ）由文件系统决定将binlog同步到硬盘。
-sync_binlog = 1 每提交一次事务，写一次binlog，并使用fsync()同步到硬盘。
-sync_binlog > 1 每提交一次事务，写一次binlog，达到sync_binlog 设定的值后，调用fsync()同步到硬盘。
-
-## 日志区别
-
-binlog：操作日志，用于回档
-
-undo log：事务日志，事务开始前的数据，用于MVCC
-
-redo log：重做日志，确保事务的持久性。防止在发生故障的时间点，尚有脏页未写入磁盘，在重启mysql服务的时候，根据redo log进行重做，从而达到事务的持久性这一特性。
-
-redo log是InnoDB引擎特有的；binlog是MySQL的Server层实现的，所有引擎都可以使用。
-
-redo log是物理日志，记录的是“在某个数据页上做了什么修改”；binlog是逻辑日志，记录的是这个语句的原始逻辑，比如“给ID=2这一行的c字段加1 ”。
-
-redo log是循环写的，空间固定会用完；binlog是可以追加写入的。“追加写”是指binlog文件写到一定大小后会切换到下一个，并不会覆盖以前的日志。
-
-## binlog和redolog一致性保证
-
-xa：先让redo log prepare，后写binlog，后commit
-
-##  ON、WHERE、HAVING的区别
-
-ON、WHERE、HAVING的主要差别是其子句中限制条件起作用时机引起的，ON是在生产临时表之前根据条件筛选记录，WHERE是从生产的临时表中筛选数据，而HAVING是对临时表中满足条件的数据，进行计算分组之后，通过HAVING限制语句筛选分组，返回结果是满足HAVING子句限制的分组。
-
-## 为什么要创建索引
+## 索引的优点
 
 索引是对数据库表中一个或多个列的值进行排序的数据结构，以协助快速查询、更新数据库表中数据。
 
-## 索引的种类：
+## 索引B+树的原因
 
-唯一索引	不允许任何两行具相同值
-主键索引	唯一索引的一种
-普通索引	无限制
-全文索引	针对较大的数据生成全文索引很耗时间空间
-
-## 增加索引也有许多不利的一个方面:
-
-时间方面：创建索引和维护索引要耗费时间
-空间方面：索引需要占物理空间。
+B+tree的磁盘读写代价低：B+树的内部节点并没有指向关键字具体信息的指针，因此其内部节点相对B树更小；
+B+tree的查询效率更加稳定；
+B+树的数据都存储在叶子结点中，分支结点均为索引，方便扫库，只需要扫一遍叶子结点即可；
 
 ## 索引有哪些？聚集索引和非聚集索引的区别？
 
@@ -74,12 +30,11 @@ FULLTEXT，HASH，BTREE，RTREE。
 - 聚集索引在叶子节点存储的是**表中的数据**
 - 非聚集索引在叶子节点存储的是**主键和索引列**
 - 使用非聚集索引查询出数据时，**拿到叶子上的主键再去查到想要查找的数据**。(拿到主键再查找这个过程叫做**回表**)
+![img](./image/135.png)
 
 ## 索引规则
 
-![å¾çæè¿°](md\28.png)
-
-遇到范围查询(>、<、between、like、order by)就停止匹配
+遇到范围查询(>、<、between、like)，范围查询后的索引失效
 
 前导模糊查询不会使用索引：like '%李'
 
@@ -87,27 +42,9 @@ or左右都要有索引
 
 负向条件（!=、<>、not in、not exists、not lik）不会使用索引，建议用in
 
-## 为什么说B+-tree比B 树更适合实际应用中操作系统的文件索引和数据库索引？
+## explain的type类型
 
-![img](md\29.png)
-
-B+tree的磁盘读写代价低：B+树的内部节点并没有指向关键字具体信息的指针，因此其内部节点相对B树更小；
-B+tree的查询效率更加稳定；
-B+树的数据都存储在叶子结点中，分支结点均为索引，方便扫库，只需要扫一遍叶子结点即可；
-
-## 什么样的字段适合建索引
-
-唯一、不为空、经常被查询，重复字段少的字段
-
-## 什么情况下不宜建立索引？
-
-对于查询中很少涉及的列或者重复值比较多的列，不宜建立索引。
-
-## 几种数据库对比
-
-![](md\83.png)
-
-es分页处理十分十分慢！
+![](./image/82.png)
 
 ## 数据库引擎有哪些？InnoDB和MyIsam有啥区别?
 
@@ -190,10 +127,6 @@ Read Repeatable隔离级别：**开启事务后第一个select语句才是快照
 
 读取的是记录数据的最新版本，并且当前读返回的记录都会加上锁，保证其他事务不会再并发的修改这条记录
 
-## next-key锁(行记录锁+Gap间隙锁)
-
-Select * from  emp where empid > 100 for update;
-
 ## RR级别 幻读例子
 
 Mysql官方给出的幻读解释是：只要在一个事务中，第二次select多出了row就算幻读。
@@ -206,18 +139,54 @@ Mysql官方给出的幻读解释是：只要在一个事务中，第二次select
 
 ## 数据库锁
 
-![img](md\32.png)
+![img](./image/32.png)
 
-![img](md\134.png)
+![img](./image/134.png)
 
-![img](md\33.png)
+![img](./image/33.png)
 
 意向锁是表级锁,只与表锁有冲突,不与行锁有冲突：
 
 意向共享锁(IS) : 在加行级读锁(S锁)前会先加意向共享锁(IS)后再加行级读锁.
 意向排他锁(IX) : 在加行级写锁(X锁)前会先加意向排他锁(IX)后再加行级写锁.
 
-## 四种锁
+next key lock:insert into class_teacher values (6（PK）,'初三五班',10（K）);
+
+在id=6加行锁，id(-∞,5],(5~10],(10~+∞)加gap锁。
+
+## 死锁例子
+
+```
+--T1时刻
+BEGIN;
+--行级锁 id=1 的记录
+select * from test1 where id=1 for update ;
+--T3时刻
+--更新 id=2 的记录
+update test1 set id=id where id=2;
+
+--T2时刻
+BEGIN;
+--行级锁 id=2 的记录
+select * from test1 where id=2 for update ;
+--T4时刻
+--更新 id=1 的记录
+update test1 set id=id where id=1;
+```
+
+## 日志区别
+
+binlog：操作日志，用于回档
+
+undo log：事务日志，事务开始前的数据，用于MVCC
+
+redo log：重做日志，确保事务的持久性。防止在发生故障的时间点，尚有脏页未写入磁盘，在重启mysql服务的时候，根据redo log进行重做，从而达到事务的持久性这一特性。
+
+redo log是InnoDB引擎特有的；binlog是MySQL的Server层实现的，所有引擎都可以使用。
+
+redo log是物理日志，记录的是“在某个数据页上做了什么修改”；binlog是逻辑日志，记录的是这个语句的原始逻辑，比如“给ID=2这一行的c字段加1 ”。
+
+redo log是循环写的，空间固定会用完；binlog是可以追加写入的。“追加写”是指binlog文件写到一定大小后会切换到下一个，并不会覆盖以前的日志。
 
 
 ## 外连接
@@ -236,14 +205,13 @@ Mysql官方给出的幻读解释是：只要在一个事务中，第二次select
 第二范式（2NF）属性完全依赖于主键：依赖于主键（联合主键）的一部分。
 第三范式（3NF）属性不依赖于其它非主属性 ：依赖于非主键列。
 
-## 查询前n名的sql语句
-
-select a.s_id,a.c_id,a.s_score from score a 
-where (select COUNT(1) from score b where b.c_id=a.c_id and b.s_score>=a.s_score)<=2 ORDER BY a.c_id
-
 ## limit 20000，10如何优化
 
 SELECT id,title,content **FROM** items **WHERE** id IN (**SELECT** id **FROM** items **ORDER** **BY** id limit 900000, 10); 
+
+## 执行顺序
+
+from -> join -> on -> where -> group by -> having -> order by -> limit -> select;
 
 ## 一个 SQL 执行的很慢的原因
 
@@ -266,7 +234,7 @@ SELECT id,title,content **FROM** items **WHERE** id IN (**SELECT** id **FROM** i
 ## explain的type类型
 
 
-![](md\82.png)
+![](./image/82.png)
 
 ## SQL优化
 
@@ -279,6 +247,26 @@ SELECT id,title,content **FROM** items **WHERE** id IN (**SELECT** id **FROM** i
 第四如果以上都做了，那就先做垂直拆分，其实就是根据你模块的耦合度，将一个大的系统分为多个小的系统，也就是分布式系统；
 
 第五才是水平切分，针对数据量大的表，这一步最麻烦，最能考验技术水平，要选择一个合理的sharding key,为了有好的查询效率，表结构也要改动，做一定的冗余，应用也要改，sql中尽量带sharding key，将数据定位到限定的表上去查，而不是扫描全部的表；
+
+## 如何保证不丢数据
+
+innodb_flush_log_at_trx_commit（刷盘redo log）：
+
+0：每秒write cache和flush disk
+
+1：每次commit都 write cache和flush disk
+
+2：每次commit都 write cache
+
+sync_binlog（刷盘bin log）：
+
+sync_binlog = 0 （mysql默认值 ）由文件系统决定将binlog同步到硬盘。
+sync_binlog = 1 每提交一次事务，写一次binlog，并使用fsync()同步到硬盘。
+sync_binlog > 1 每提交一次事务，写一次binlog，达到sync_binlog 设定的值后，调用fsync()同步到硬盘。
+
+## binlog和redolog一致性保证
+
+xa：先让redo log prepare，后写binlog，后commit
 
 ## 读写分离
 
@@ -298,7 +286,7 @@ canal 解析 binary log 对象(原始为 byte 流)
 
 SnowFlake算法：
 
-![](md\129.png)
+![](./image/129.png)
 
 缺点：
 
@@ -354,12 +342,6 @@ Leaf-SnowFlake算法：
 解除数据库实例的主从同步关系，并使之生效；
 此时，四个节点的数据都已完整，只是有冗余(多存了和自己配对的节点的那部分数据)，择机清除即可(过后随时进行，不影响业务)。
 
-## MySQL的delete,drop与truncate区别？
-
-drop	表级的删除；
-truncate	清空表；
-delete	配合where删除数据；
-
 ## MySQL中varchar与char的区别以及varchar(50)中的50代表的涵义
 
 #### (1)、varchar与char的区别
@@ -375,14 +357,6 @@ char是一种固定长度的类型，varchar则是一种可变长度的类型
 是指显示字符的长度
 但要加参数的，最大为255，比如它是记录行数的id,插入10笔资料，它就显示00000000001 ~~~00000000010，当字符的位数超过11,它也只显示11位，如果你没有加那个让它未满11位就前面加0的参数，它不会在前面加0
 20表示最大显示宽度为20，但仍占4字节存储，存储范围不变；
-
-## 有多少种日志?
-
-错误日志：记录出错信息，也记录一些警告信息或者正确的信息。
-查询日志：记录所有对数据库请求的信息，不论这些请求是否得到了正确的执行。
-二进制日志：记录对数据库执行更改的所有操作。
-慢查询日志：设置一个阈值，将运行时间超过该值的所有SQL语句都记录到慢查询的日志文件中。
-事务日志：
 
 ## 存储过程和触发器
 
@@ -630,7 +604,7 @@ Redi检查内存使用情况，如果大于maxmemory的限制, 则根据设定�
 
 双缓存机制：设置一级缓存和二级缓存，一级缓存过期时间短，二级缓存过期时间长或者不过期，一级缓存失效后访问二级缓存，同时刷新一级缓存和二级缓存。
 
-![img](md\34.png)
+![img](./image/34.png)
 
 ## 缓存一致性
 
@@ -692,9 +666,9 @@ Redis Cluster着眼于扩展性，在单个redis内存不足时，使用Cluster�
 
 ## 倒排索引
 
-![](md\121.png)
+![](./image/121.png)
 
-![](md\96.png)
+![](./image/96.png)
 
 ## 交集算法
 
@@ -718,7 +692,7 @@ posting list为[1,3,4,7,10]， 则bitset为[1,0,1,1,0,0,1,0,0,1]，一共十个�
 
 ## 写入流程
 
-![](md\122.png)
+![](./image/122.png)
 
 #### 分段（Segment）
 
